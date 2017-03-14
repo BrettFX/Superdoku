@@ -92,14 +92,12 @@ public class Superdoku extends Application {
 	 * Driver method to solve the SuDoKu puzzle
 	 * 
 	 * @param the two-dimensional 9x9 puzzle to be solved 
+	 * @param row the current row within the 9x9 SuDoKu puzzle
+	 * @param col the current column  within the 9x9 SuDoKu puzzle
 	 * */
-	public static void solvePuzzle(int p[][]){
-		for(int x = 0; x < p.length; x++){
-			for(int y = 0; y < p[x].length; y++){
-				if(followsRowRule(p, x) && followsColRule(p, y) && followsSquareRule(p, x, y)){
-					
-				}
-			}
+	public static void solvePuzzle(int p[][], int row, int col){
+		if(followsRowRule(p, row) && followsColRule(p, col) && followsSquareRule(p, row, col)){
+			
 		}
 	}
 	
