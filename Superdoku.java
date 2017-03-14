@@ -31,8 +31,7 @@ public class Superdoku extends Application {
 			{0, 9, 0,   1, 0, 5,   0, 8, 0},
 			{0, 0, 0,   0, 0, 9,   2, 0, 0},
 			{0, 2, 0,   0, 0, 0,   0, 7, 0},
-	};
-	
+	};	
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -49,8 +48,16 @@ public class Superdoku extends Application {
 	
 	public static void main(String[] args) {
 		int[][] p = PUZZLE1;
+		long startTime, endTime;
 		
 		displayPuzzle(p);
+		
+		startTime = System.currentTimeMillis();
+		
+				
+		
+		endTime = System.currentTimeMillis();
+		System.out.println("Solved puzzle in " + (endTime - startTime) + " milliseconds.");		
 		
 		//launch(args);
 	}
@@ -79,5 +86,48 @@ public class Superdoku extends Application {
 		}
 		
 		System.out.println("+-----------------+");
+	}
+	
+	/**
+	 * Driver method to solve the SuDoKu puzzle
+	 * 
+	 * @param the two-dimensional 9x9 puzzle to be solved 
+	 * */
+	public static void solvePuzzle(int p[][]){
+		
+	}
+	
+	/**
+	 * Determines if the number to be inserted has not already been used in the current row
+	 * 
+	 * @param p the two-dimensional 9x9 puzzle
+	 * @param row the row of the puzzle to be determined if valid
+	 * @return whether the number to be inserted is valid or not
+	 * */
+	public static boolean followsRowRule(int p[][], int row){
+		return true;
+	}
+	
+	/**
+	 * Determines if the number to be inserted has not already been used in the current column
+	 * 
+	 * @param p the two-dimensional 9x9 puzzle
+	 * @param col the column of the puzzle to be determined if valid
+	 * @return whether the number to be inserted is valid or not
+	 * */
+	public static boolean followsColRule(int p[][], int col){
+		return true;
+	}
+	
+	/**
+	 * Determines if the number to be inserted has not already been used in the current column
+	 * 
+	 * @param p the two-dimensional 9x9 puzzle
+	 * @param row the row in the 3x3 subspace of the puzzle to be determined if valid
+	 * @param col the column in the 3x3 subspace of the puzzle to be determined if valid
+	 * @return whether the number to be inserted is valid within the 3x3 subspace or not
+	 * */
+	public static boolean followsSquareRule(int p[][], int row, int col){
+		return true;
 	}
 }
