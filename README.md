@@ -1,6 +1,5 @@
 #Superdoku
 
-##About:
 Superdoku is a a tool to be used to solve sudoku puzzles of varying difficulty.
 This software application features a visually aesthetic graphical user interface
 that allows the user to choose amongst input methods. The user may choose to enter
