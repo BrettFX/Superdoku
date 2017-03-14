@@ -99,7 +99,7 @@ public class Superdoku extends Application {
 		
 		//Try each number 1-9 until it satisfies all three rules
 		for(int num = 1; num <= 9; num++){
-			if(followsRowRule(p, row, num) && followsColRule(p, col) && followsSquareRule(p, row, col)){
+			if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col)){
 				
 			}
 		}		
@@ -115,7 +115,7 @@ public class Superdoku extends Application {
 	 * */
 	public static boolean followsRowRule(int p[][], int row, int num){
 		for(int y = 0; y < p[row].length; y++){
-			//If a number in the row already exists then the number in questions does not satisfy the row rule
+			//If a number in the row already exists then the number in question does not satisfy the row rule
 			if(p[row][y] == num){
 				return false;
 			}
@@ -128,9 +128,17 @@ public class Superdoku extends Application {
 	 * 
 	 * @param p the two-dimensional 9x9 puzzle
 	 * @param col the column of the puzzle to be determined if valid
+	 * @param num the number to determine is valid
 	 * @return whether the number to be inserted is valid or not
 	 * */
-	public static boolean followsColRule(int p[][], int col){
+	public static boolean followsColRule(int p[][], int col, int num){
+		for(int x = 0; x < p.length; x++){
+			//If a number in the column already exists then the number in question does not satisfy the column rule
+			if(p[x][col] == num){
+				return false;
+			}
+		}
+		
 		return true;
 	}
 	
