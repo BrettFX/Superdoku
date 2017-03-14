@@ -94,14 +94,20 @@ public class Superdoku extends Application {
 	 * @param the two-dimensional 9x9 puzzle to be solved 
 	 * */
 	public static void solvePuzzle(int p[][]){
-		
+		for(int x = 0; x < p.length; x++){
+			for(int y = 0; y < p[x].length; y++){
+				if(followsRowRule(p, x) && followsColRule(p, y) && followsSquareRule(p, x, y)){
+					
+				}
+			}
+		}
 	}
 	
 	/**
 	 * Determines if the number to be inserted has not already been used in the current row
 	 * 
 	 * @param p the two-dimensional 9x9 puzzle
-	 * @param row the row of the puzzle to be determined if valid
+	 * @param row the row to be determined if the number to be inserted is valid
 	 * @return whether the number to be inserted is valid or not
 	 * */
 	public static boolean followsRowRule(int p[][], int row){
