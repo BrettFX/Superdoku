@@ -18,7 +18,7 @@ import javafx.scene.layout.BorderPane;
 
 public class Superdoku extends Application {
 	
-	public static final int[][] PUZZLE1 = 
+	public static final int[][] PUZZLE1 =
 	{
 			{0, 4, 0 ,  0, 0, 0,   0, 6, 0},
 			{7, 0, 6,   2, 0, 0,   0, 0, 0},
@@ -50,14 +50,19 @@ public class Superdoku extends Application {
 		int[][] p = PUZZLE1;
 		long startTime, endTime;
 		
+		System.out.println("Here is the problem:");
 		displayPuzzle(p);
 		
 		startTime = System.currentTimeMillis();
 		
-		solvePuzzle(p, 0, 0);		
+		//Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
+		solvePuzzle(p, 0, 0);	
+		
+		System.out.println("Here is the solution:");
+		displayPuzzle(p);
 		
 		endTime = System.currentTimeMillis();
-		System.out.println("Solved puzzle in " + (endTime - startTime) + " milliseconds.");		
+		System.out.println("Solution took " + (endTime - startTime) + " milliseconds to derive.");		
 		
 		//launch(args);
 	}
@@ -96,6 +101,8 @@ public class Superdoku extends Application {
 	 * @param col the current column  within the 9x9 SuDoKu puzzle
 	 * */
 	public static void solvePuzzle(int p[][], int row, int col){
+		
+		
 		
 		//Try each number 1-9 until it satisfies all three rules
 		for(int num = 1; num <= 9; num++){
