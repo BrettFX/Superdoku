@@ -54,7 +54,7 @@ public class Superdoku extends Application {
 		
 		startTime = System.currentTimeMillis();
 		
-				
+		solvePuzzle(p, 0, 0);		
 		
 		endTime = System.currentTimeMillis();
 		System.out.println("Solved puzzle in " + (endTime - startTime) + " milliseconds.");		
@@ -99,10 +99,10 @@ public class Superdoku extends Application {
 		
 		//Try each number 1-9 until it satisfies all three rules
 		for(int num = 1; num <= 9; num++){
-			if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col)){
+			if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col, num)){
 				
 			}
-		}		
+		}			
 	}
 	
 	/**
@@ -143,14 +143,43 @@ public class Superdoku extends Application {
 	}
 	
 	/**
-	 * Determines if the number to be inserted has not already been used in the current column
+	 * Determines if the number to be inserted has not already been used in the 3x3 subspace
+	 * that the current cell lives in
 	 * 
 	 * @param p the two-dimensional 9x9 puzzle
 	 * @param row the row in the 3x3 subspace of the puzzle to be determined if valid
 	 * @param col the column in the 3x3 subspace of the puzzle to be determined if valid
 	 * @return whether the number to be inserted is valid within the 3x3 subspace or not
 	 * */
-	public static boolean followsSquareRule(int p[][], int row, int col){
+	public static boolean followsSquareRule(int p[][], int row, int col, int num){
+		int xStart, yStart;
+		
+		if(row >= 6){
+			xStart = 6;
+		}else if(row >= 3){
+			xStart = 3;
+		}else{
+			xStart = 0;
+		}
+		
+		if(col >= 6){
+			yStart = 6;
+		}else if(col >= 3){
+			yStart = 3;
+		}else{
+			yStart = 0;
+		}
+		
+		for(int x = xStart; x < xStart + 3; x++){
+			for(int y = yStart; y < yStart + 3; y++){				
+				if(x!= row && y!= col){
+					if(p[x][y] == num){
+						return false;
+					}
+				}
+			}
+		}
+		
 		return true;
 	}
 }
