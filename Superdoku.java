@@ -58,7 +58,7 @@ public class Superdoku extends Application {
 		//Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
 		solvePuzzle(p, 0, 0);	
 		
-		System.out.println("Here is the solution:");
+		System.out.println("\nHere is the solution:");
 		displayPuzzle(p);
 		
 		endTime = System.currentTimeMillis();
@@ -102,13 +102,31 @@ public class Superdoku extends Application {
 	 * */
 	public static void solvePuzzle(int p[][], int row, int col){
 		
+		if(col >= p[row].length){
+			col = 0;
+			row++;
+		}
 		
+		//Puzzle solved
+		if(row >= p.length){
+			return;
+		}		
 		
 		//Try each number 1-9 until it satisfies all three rules
 		for(int num = 1; num <= 9; num++){
-			if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col, num)){
-				p[row][col] = num;
-			}
+			if(p[row][col] == 0){
+				if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col, num)){
+					p[row][col] = num;
+					solvePuzzle(p, row, col + 1);
+					p[row][col] = 0;
+				}else{
+					//There was an error. We must go back and correct it
+					solvePuzzle(p, row, col + 1);
+					return;
+				}
+			}		
+			
+			
 		}			
 	}
 	
