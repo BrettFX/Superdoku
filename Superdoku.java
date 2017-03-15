@@ -100,7 +100,7 @@ public class Superdoku extends Application {
 		//Try each number 1-9 until it satisfies all three rules
 		for(int num = 1; num <= 9; num++){
 			if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col, num)){
-				
+				p[row][col] = num;
 			}
 		}			
 	}
@@ -149,6 +149,7 @@ public class Superdoku extends Application {
 	 * @param p the two-dimensional 9x9 puzzle
 	 * @param row the row in the 3x3 subspace of the puzzle to be determined if valid
 	 * @param col the column in the 3x3 subspace of the puzzle to be determined if valid
+	 * @param num the number to determine is valid
 	 * @return whether the number to be inserted is valid within the 3x3 subspace or not
 	 * */
 	public static boolean followsSquareRule(int p[][], int row, int col, int num){
