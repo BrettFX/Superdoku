@@ -127,7 +127,6 @@ public class Superdoku extends Application {
 		}else{
 			//There was an error. We must go back and correct it
 			solvePuzzle(p, row, col + 1);
-			return;
 		}
 					
 	}
