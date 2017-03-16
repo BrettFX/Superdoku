@@ -9,6 +9,10 @@ public class SuperdokuController {
 	
 	private boolean isSolved;
 	
+	public SuperdokuController(){
+		Superdoku.stage.setResizable(false);
+	}
+	
 	/**
 	 * Displays the SuDoKu puzzle to the console
 	 * 
