@@ -53,7 +53,7 @@ public class Superdoku extends Application {
 		System.out.println("Here is the problem:\n");
 		displayPuzzle(p);
 		
-		/*startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
 		
 		//Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
 		solvePuzzle(p, 0, 0);	
@@ -62,7 +62,7 @@ public class Superdoku extends Application {
 		displayPuzzle(p);
 		
 		endTime = System.currentTimeMillis();
-		System.out.println("Solution took " + (endTime - startTime) + " milliseconds to derive.");*/		
+		System.out.println("Solution took " + (endTime - startTime) + " milliseconds to derive.");		
 		
 		//launch(args);
 	}
@@ -73,6 +73,7 @@ public class Superdoku extends Application {
 	 * @param p the two-dimensional 9x9 puzzle to be displayed
 	 * */
 	public static void displayPuzzle(int p[][]){
+		//The character to determine formatting
 		String d;
 		
 		for(int x = 0; x < p.length; x++){			
