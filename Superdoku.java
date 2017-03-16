@@ -50,10 +50,10 @@ public class Superdoku extends Application {
 		int[][] p = PUZZLE1;
 		long startTime, endTime;
 		
-		System.out.println("Here is the problem:");
+		System.out.println("Here is the problem:\n");
 		displayPuzzle(p);
 		
-		startTime = System.currentTimeMillis();
+		/*startTime = System.currentTimeMillis();
 		
 		//Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
 		solvePuzzle(p, 0, 0);	
@@ -62,7 +62,7 @@ public class Superdoku extends Application {
 		displayPuzzle(p);
 		
 		endTime = System.currentTimeMillis();
-		System.out.println("Solution took " + (endTime - startTime) + " milliseconds to derive.");		
+		System.out.println("Solution took " + (endTime - startTime) + " milliseconds to derive.");*/		
 		
 		//launch(args);
 	}
@@ -73,24 +73,18 @@ public class Superdoku extends Application {
 	 * @param p the two-dimensional 9x9 puzzle to be displayed
 	 * */
 	public static void displayPuzzle(int p[][]){
-		System.out.println("+-----------------+");
+		String d;
 		
-		for(int x = 0; x < p.length; x++){
-			
-			if(x!= 0 && x % 3 == 0){
-				System.out.println("|-----+-----+-----|");
-			}
-			
+		for(int x = 0; x < p.length; x++){			
 			for(int y = 0; y < p[x].length; y++){	
 				//Print out a divider every third line
-				String d = (y % 3 == 0) ? "|" : " ";
+				d = (y % 3 == 0) ? "\t" : " ";
 				System.out.print(d + p[x][y]);				
-			}
+			}	
 			
-			System.out.println("|");			
+			d = ((x + 1) % 3 == 0) ? "\n" : "";
+			System.out.println(d);
 		}
-		
-		System.out.println("+-----------------+");
 	}
 	
 	/**
