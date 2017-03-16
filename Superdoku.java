@@ -111,21 +111,25 @@ public class Superdoku extends Application {
 			return;
 		}		
 		
-		//Try each number 1-9 until it satisfies all three rules
-		for(int num = 1; num <= 9; num++){	
-			if(p[row][col] == 0){
+		if(p[row][col] == 0){
+			//Try each number 1-9 until it satisfies all three rules
+			for(int num = 1; num <= 9; num++){	
 				if(followsRowRule(p, row, num) && followsColRule(p, col, num) && followsSquareRule(p, row, col, num)){
 					p[row][col] = num;
-					solvePuzzle(p, row, col + 1);					
-					if(isSolved) return;					
+					solvePuzzle(p, row, col + 1);	
+					
+					if(isSolved) 
+						return;	
+					
 					p[row][col] = 0;
 				}
-			}else{
-				//There was an error. We must go back and correct it
-				solvePuzzle(p, row, col + 1);
-				return;
-			}
-		}					
+			}		
+		}else{
+			//There was an error. We must go back and correct it
+			solvePuzzle(p, row, col + 1);
+			return;
+		}
+					
 	}
 	
 	/**
