@@ -7,93 +7,93 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="437.0" prefWidth="365.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="437.0" prefWidth="365.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SuperdokuController">
   <tabs>
     <Tab fx:id="tabDataEntry" text="Data Entry">
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="376.0" prefWidth="436.0">
                <children>
-                  <TextField fx:id="txt00" layoutX="14.0" layoutY="19.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt01" layoutX="48.0" layoutY="19.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt02" layoutX="83.0" layoutY="19.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt10" layoutX="14.0" layoutY="56.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt11" layoutX="48.0" layoutY="56.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt12" layoutX="83.0" layoutY="56.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt20" layoutX="14.0" layoutY="92.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt21" layoutX="48.0" layoutY="92.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt22" layoutX="83.0" layoutY="92.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt03" layoutX="137.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt04" layoutX="171.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt05" layoutX="206.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt13" layoutX="137.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt14" layoutX="171.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt15" layoutX="206.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt23" layoutX="137.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt24" layoutX="171.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt25" layoutX="206.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt06" layoutX="252.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt07" layoutX="286.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt08" layoutX="321.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt16" layoutX="252.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt17" layoutX="286.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt18" layoutX="321.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt26" layoutX="252.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt27" layoutX="286.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt28" layoutX="321.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt30" layoutX="14.0" layoutY="140.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt31" layoutX="48.0" layoutY="140.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt32" layoutX="83.0" layoutY="140.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt40" layoutX="14.0" layoutY="177.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt41" layoutX="48.0" layoutY="177.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt42" layoutX="83.0" layoutY="177.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt50" layoutX="14.0" layoutY="213.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt51" layoutX="48.0" layoutY="213.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt52" layoutX="83.0" layoutY="213.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt33" layoutX="137.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt34" layoutX="171.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt35" layoutX="206.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt43" layoutX="137.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt44" layoutX="171.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt45" layoutX="206.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt53" layoutX="137.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt54" layoutX="171.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt55" layoutX="206.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt36" layoutX="252.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt37" layoutX="286.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt38" layoutX="321.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt46" layoutX="252.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt47" layoutX="286.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt48" layoutX="321.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt56" layoutX="252.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt57" layoutX="286.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt58" layoutX="321.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt60" layoutX="14.0" layoutY="258.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt61" layoutX="48.0" layoutY="258.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt62" layoutX="83.0" layoutY="258.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt70" layoutX="14.0" layoutY="295.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt71" layoutX="48.0" layoutY="295.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt72" layoutX="83.0" layoutY="295.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt80" layoutX="14.0" layoutY="331.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt81" layoutX="48.0" layoutY="331.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt82" layoutX="83.0" layoutY="331.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt63" layoutX="137.0" layoutY="259.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt64" layoutX="171.0" layoutY="259.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt65" layoutX="206.0" layoutY="259.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt73" layoutX="137.0" layoutY="296.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt74" layoutX="171.0" layoutY="296.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt75" layoutX="206.0" layoutY="296.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt83" layoutX="137.0" layoutY="332.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt84" layoutX="171.0" layoutY="332.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt85" layoutX="206.0" layoutY="332.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt66" layoutX="252.0" layoutY="260.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt67" layoutX="286.0" layoutY="260.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt68" layoutX="321.0" layoutY="260.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt76" layoutX="252.0" layoutY="297.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt77" layoutX="286.0" layoutY="297.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt78" layoutX="321.0" layoutY="297.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt86" layoutX="252.0" layoutY="333.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt87" layoutX="286.0" layoutY="333.0" prefHeight="29.0" prefWidth="28.0" />
-                  <TextField fx:id="txt88" layoutX="321.0" layoutY="333.0" prefHeight="29.0" prefWidth="28.0" />
+                  <TextField fx:id="txt00" alignment="CENTER" layoutX="14.0" layoutY="19.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt01" alignment="CENTER" layoutX="48.0" layoutY="19.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt02" alignment="CENTER" layoutX="83.0" layoutY="19.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt10" alignment="CENTER" layoutX="14.0" layoutY="56.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt11" alignment="CENTER" layoutX="48.0" layoutY="56.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt12" alignment="CENTER" layoutX="83.0" layoutY="56.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt20" alignment="CENTER" layoutX="14.0" layoutY="92.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt21" alignment="CENTER" layoutX="48.0" layoutY="92.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt22" alignment="CENTER" layoutX="83.0" layoutY="92.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt03" alignment="CENTER" layoutX="137.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt04" alignment="CENTER" layoutX="171.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt05" alignment="CENTER" layoutX="206.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt13" alignment="CENTER" layoutX="137.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt14" alignment="CENTER" layoutX="171.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt15" alignment="CENTER" layoutX="206.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt23" alignment="CENTER" layoutX="137.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt24" alignment="CENTER" layoutX="171.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt25" alignment="CENTER" layoutX="206.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt06" alignment="CENTER" layoutX="252.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt07" alignment="CENTER" layoutX="286.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt08" alignment="CENTER" layoutX="321.0" layoutY="20.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt16" alignment="CENTER" layoutX="252.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt17" alignment="CENTER" layoutX="286.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt18" alignment="CENTER" layoutX="321.0" layoutY="57.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt26" alignment="CENTER" layoutX="252.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt27" alignment="CENTER" layoutX="286.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt28" alignment="CENTER" layoutX="321.0" layoutY="93.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt30" alignment="CENTER" layoutX="14.0" layoutY="140.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt31" alignment="CENTER" layoutX="48.0" layoutY="140.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt32" alignment="CENTER" layoutX="83.0" layoutY="140.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt40" alignment="CENTER" layoutX="14.0" layoutY="177.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt41" alignment="CENTER" layoutX="48.0" layoutY="177.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt42" alignment="CENTER" layoutX="83.0" layoutY="177.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt50" alignment="CENTER" layoutX="14.0" layoutY="213.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt51" alignment="CENTER" layoutX="48.0" layoutY="213.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt52" alignment="CENTER" layoutX="83.0" layoutY="213.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt33" alignment="CENTER" layoutX="137.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt34" alignment="CENTER" layoutX="171.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt35" alignment="CENTER" layoutX="206.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt43" alignment="CENTER" layoutX="137.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt44" alignment="CENTER" layoutX="171.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt45" alignment="CENTER" layoutX="206.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt53" alignment="CENTER" layoutX="137.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt54" alignment="CENTER" layoutX="171.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt55" alignment="CENTER" layoutX="206.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt36" alignment="CENTER" layoutX="252.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt37" alignment="CENTER" layoutX="286.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt38" alignment="CENTER" layoutX="321.0" layoutY="141.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt46" alignment="CENTER" layoutX="252.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt47" alignment="CENTER" layoutX="286.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt48" alignment="CENTER" layoutX="321.0" layoutY="178.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt56" alignment="CENTER" layoutX="252.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt57" alignment="CENTER" layoutX="286.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt58" alignment="CENTER" layoutX="321.0" layoutY="214.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt60" alignment="CENTER" layoutX="14.0" layoutY="258.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt61" alignment="CENTER" layoutX="48.0" layoutY="258.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt62" alignment="CENTER" layoutX="83.0" layoutY="258.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt70" alignment="CENTER" layoutX="14.0" layoutY="295.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt71" alignment="CENTER" layoutX="48.0" layoutY="295.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt72" alignment="CENTER" layoutX="83.0" layoutY="295.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt80" alignment="CENTER" layoutX="14.0" layoutY="331.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt81" alignment="CENTER" layoutX="48.0" layoutY="331.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt82" alignment="CENTER" layoutX="83.0" layoutY="331.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt63" alignment="CENTER" layoutX="137.0" layoutY="259.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt64" alignment="CENTER" layoutX="171.0" layoutY="259.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt65" alignment="CENTER" layoutX="206.0" layoutY="259.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt73" alignment="CENTER" layoutX="137.0" layoutY="296.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt74" alignment="CENTER" layoutX="171.0" layoutY="296.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt75" alignment="CENTER" layoutX="206.0" layoutY="296.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt83" alignment="CENTER" layoutX="137.0" layoutY="332.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt84" alignment="CENTER" layoutX="171.0" layoutY="332.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt85" alignment="CENTER" layoutX="206.0" layoutY="332.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt66" alignment="CENTER" layoutX="252.0" layoutY="260.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt67" alignment="CENTER" layoutX="286.0" layoutY="260.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt68" alignment="CENTER" layoutX="321.0" layoutY="260.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt76" alignment="CENTER" layoutX="252.0" layoutY="297.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt77" alignment="CENTER" layoutX="286.0" layoutY="297.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt78" alignment="CENTER" layoutX="321.0" layoutY="297.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt86" alignment="CENTER" layoutX="252.0" layoutY="333.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt87" alignment="CENTER" layoutX="286.0" layoutY="333.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
+                  <TextField fx:id="txt88" alignment="CENTER" layoutX="321.0" layoutY="333.0" prefHeight="29.0" prefWidth="28.0" promptText="0" />
                   <Separator layoutX="122.0" layoutY="9.0" orientation="VERTICAL" prefHeight="360.0" prefWidth="6.0" />
                   <Separator layoutX="242.0" layoutY="9.0" orientation="VERTICAL" prefHeight="360.0" prefWidth="6.0" />
                   <Separator layoutX="4.0" layoutY="125.0" prefHeight="10.0" prefWidth="356.0" />

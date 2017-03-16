@@ -6,5 +6,5 @@
 package application;
 
 public class SuperdokuController {
-
+	
 }
