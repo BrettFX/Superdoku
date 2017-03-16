@@ -94,7 +94,8 @@ public class Superdoku extends Application {
 	}
 	
 	/**
-	 * Driver method to solve the SuDoKu puzzle
+	 * Driver method to solve the SuDoKu puzzle.
+	 * Recursively determines the correct numbers for each cell
 	 * 
 	 * @param the two-dimensional 9x9 puzzle to be solved 
 	 * @param row the current row within the 9x9 SuDoKu puzzle
@@ -107,7 +108,7 @@ public class Superdoku extends Application {
 			row++;
 		}
 		
-		//Puzzle solved
+		//Puzzle solved (we reached the last cell without any errors)
 		if(row >= p.length){
 			return;
 		}		
