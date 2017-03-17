@@ -63,8 +63,6 @@ public class SuperdokuController {
 		}
 		
 		System.out.println("Puzzle initialized");
-		
-		displayPuzzle();
 	}
 	
 	/**
@@ -77,17 +75,16 @@ public class SuperdokuController {
 		//Get the contents of the cell in which the data was entered
 		TextField cell = (TextField)event.getSource();
 		
+		int r = Character.getNumericValue(cellID.charAt(0));
+		int c = Character.getNumericValue(cellID.charAt(1));
+		
 		validateTextField(cell);
 		
 		//System.out.println(cell.getText() + " was entered for row: " + cellID.charAt(0) + " column: " + cellID.charAt(1));
 		
-		//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid
-		if(!cell.getText().isEmpty()){
-			int r = Character.getNumericValue(cellID.charAt(0));
-			int c = Character.getNumericValue(cellID.charAt(1));
-			
-			sudokuPuzzle[r][c] = Integer.parseInt(cell.getText());			
-		}
+		//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
+		sudokuPuzzle[r][c] = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
+		System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
 	}
 	
 	/**
