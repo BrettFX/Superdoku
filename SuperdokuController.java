@@ -5,6 +5,9 @@
 
 package application;
 
+import java.util.HashMap;
+
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -141,18 +144,27 @@ public class SuperdokuController {
 	 * @param p the two-dimensional 9x9 puzzle to be displayed
 	 * */
 	public void displayPuzzle(){
-		//The character to determine formatting
-		String d;
 		
+		//Getting text field based on id
+		ObservableList<Node> obsList = superdokuAnchor.getChildren();
+		
+		//Create a HashMap to reference the text fields
+		HashMap<String, TextField> txtFieldMap = new HashMap<String, TextField>();
+		
+		//Populate the txtFieldMap
+		for(int nodeIndex = 0; nodeIndex < obsList.size(); nodeIndex++){
+			Node node = obsList.get(nodeIndex); 
+			if(node instanceof TextField){				
+				txtFieldMap.put(((TextField)node).getId(), (TextField)node);
+			}
+		}
+		
+		//Use the values from the sudokuPuzzle and write them to the respective cell using the txtFieldMap
 		for(int x = 0; x < sudokuPuzzle.length; x++){			
 			for(int y = 0; y < sudokuPuzzle[x].length; y++){	
-				//Print out a divider every third line
-				d = (y % 3 == 0) ? "\t" : " ";
-				System.out.print(d + sudokuPuzzle[x][y]);				
-			}	
-			
-			d = ((x + 1) % 3 == 0) ? "\n" : "";
-			System.out.println(d);
+				TextField tf = txtFieldMap.get("txt" + x + "" + y);				
+				tf.setText(sudokuPuzzle[x][y] + "");
+			}
 		}
 	}
 	
