@@ -33,8 +33,7 @@ public class SuperdokuController {
 	
 	public SuperdokuController(){
 		Superdoku.stage.setResizable(false);
-		sudokuPuzzle = new int[9][9];
-		
+		sudokuPuzzle = new int[9][9];		
 		initializePuzzle();
 	}
 	
@@ -144,6 +143,9 @@ public class SuperdokuController {
 	 * @param p the two-dimensional 9x9 puzzle to be displayed
 	 * */
 	public void displayPuzzle(){
+
+		//The character to determine formatting
+		String d;
 		
 		//Getting text field based on id
 		ObservableList<Node> obsList = superdokuAnchor.getChildren();
@@ -164,7 +166,14 @@ public class SuperdokuController {
 			for(int y = 0; y < sudokuPuzzle[x].length; y++){	
 				TextField tf = txtFieldMap.get("txt" + x + "" + y);				
 				tf.setText(sudokuPuzzle[x][y] + "");
+				
+				//Print out a divider every third line
+				d = (y % 3 == 0) ? "\t" : " ";
+				System.out.print(d + sudokuPuzzle[x][y]);
 			}
+			
+			d = ((x + 1) % 3 == 0) ? "\n" : "";
+			System.out.println(d);
 		}
 	}
 	
