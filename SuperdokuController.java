@@ -20,6 +20,7 @@ public class SuperdokuController {
 	@FXML
 	private TextField txtCell;
 	
+	//An initialized 9x9 matrix
 	private int[][] puzzle =
 	{
 			{0, 0, 0 ,  0, 0, 0,   0, 0, 0},

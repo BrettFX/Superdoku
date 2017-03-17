@@ -21,23 +21,6 @@ public class Superdoku extends Application {
 	
 	public static Stage stage;
 	
-	public static boolean isSolved = false;
-	
-	public static final int[][] PUZZLE1 =
-	{
-			{0, 0, 3 ,  0, 0, 0,   0, 0, 4},
-			{6, 0, 0,   0, 0, 0,   0, 9, 0},
-			{0, 1, 0,   8, 0, 0,   0, 0, 0},
-			
-			{0, 0, 4,   0, 0, 9,   0, 3, 0},
-			{0, 7, 0,   0, 0, 0,   0, 0, 8},
-			{5, 0, 0,   2, 0, 0,   6, 0, 0},
-			
-			{0, 8, 0,   0, 0, 4,   0, 7, 0},
-			{0, 0, 9,   0, 6, 0,   0, 0, 0},
-			{2, 0, 0,   3, 0, 0,   5, 0, 0},
-	};	
-	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -52,26 +35,6 @@ public class Superdoku extends Application {
 	}
 	
 	public static void main(String[] args) {
-		/*int[][] p = PUZZLE1;
-		long startTime, endTime;
-		
-		SuperdokuController test = new SuperdokuController();
-		
-		System.out.println("Here is the problem:\n");
-		test.displayPuzzle(p);
-		
-		startTime = System.currentTimeMillis();
-		
-		//Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
-		test.solvePuzzle(p, 0, 0);	
-		
-		System.out.println("\nHere is the solution:\n");
-		test.displayPuzzle(p);
-		
-		endTime = System.currentTimeMillis();
-		System.out.println("Solution took " + (endTime - startTime) + " millisecond(s) to derive.");		
-		*/
-		
 		launch(args);
 	}
 }
