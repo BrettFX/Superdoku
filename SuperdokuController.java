@@ -6,13 +6,18 @@
 package application;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 
 public class SuperdokuController {
 	
 	private boolean isSolved;
+	
+	@FXML
+	private AnchorPane superdokuAnchor;
 	
 	@FXML
 	private Button btnSolve;
@@ -26,6 +31,7 @@ public class SuperdokuController {
 	public SuperdokuController(){
 		Superdoku.stage.setResizable(false);
 		sudokuPuzzle = new int[9][9];
+		
 		initializePuzzle();
 	}
 	
@@ -62,13 +68,30 @@ public class SuperdokuController {
 			}	
 		}
 		
+		clearCells();
+		
 		System.out.println("Puzzle initialized");
+	}
+	
+	/**
+	 * Clears all the text field cells in the 9x9 matrix
+	 * */
+	private void clearCells(){		
+		if(superdokuAnchor != null){
+			for(Node node : superdokuAnchor.getChildren()){				
+				if(node instanceof TextField){
+					((TextField)node).clear();
+				}
+			}
+		}
 	}
 	
 	/**
 	 * 
 	 * */
 	public void getInput(KeyEvent event){
+		System.out.println(event.getCode().toString());
+		
 		//Get the cell id from the event source
 		String cellID = event.getSource().toString().substring(16, 18);	
 		
@@ -78,13 +101,20 @@ public class SuperdokuController {
 		int r = Character.getNumericValue(cellID.charAt(0));
 		int c = Character.getNumericValue(cellID.charAt(1));
 		
-		validateTextField(cell);
-		
-		//System.out.println(cell.getText() + " was entered for row: " + cellID.charAt(0) + " column: " + cellID.charAt(1));
-		
-		//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
-		sudokuPuzzle[r][c] = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
-		System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
+		//Prevent error if tab is typed
+		if(event.getCode().toString() != "TAB"){
+			
+			//No need to validate if the user is deleting an entry
+			if(event.getCode().toString() != "BACK_SPACE"){
+				validateTextField(cell);
+			}
+			
+			//System.out.println(cell.getText() + " was entered for row: " + cellID.charAt(0) + " column: " + cellID.charAt(1));
+			
+			//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
+			sudokuPuzzle[r][c] = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
+			System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
+		}		
 	}
 	
 	/**

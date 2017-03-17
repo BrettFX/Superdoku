@@ -13,7 +13,7 @@
   <tabs>
     <Tab fx:id="tabDataEntry" text="Data Entry">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="376.0" prefWidth="436.0">
+        <AnchorPane fx:id="superdokuAnchor" minHeight="0.0" minWidth="0.0" prefHeight="376.0" prefWidth="436.0">
                <children>
                   <TextField fx:id="txt00" alignment="CENTER" layoutX="14.0" layoutY="19.0" onKeyReleased="#getInput" prefHeight="29.0" prefWidth="28.0" />
                   <TextField fx:id="txt01" alignment="CENTER" layoutX="48.0" layoutY="19.0" onKeyReleased="#getInput" prefHeight="29.0" prefWidth="28.0" />
