@@ -105,18 +105,14 @@ public class SuperdokuController {
 		int r = Character.getNumericValue(cellID.charAt(0));
 		int c = Character.getNumericValue(cellID.charAt(1));
 		
-		//Prevent error if tab is typed
-		if(event.getCode().toString() != "TAB"){
-			
-			//No need to validate if the user is deleting an entry			
-			if(event.getCode().toString().contains("NUMPAD") ||  event.getCode().toString().contains("DIGIT")){
-				validateTextField(cell);
-			}					
+		//No need to validate if the user is deleting an entry			
+		if(event.getCode().toString().contains("NUMPAD") ||  event.getCode().toString().contains("DIGIT")){
+			validateTextField(cell);
 			
 			//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
 			sudokuPuzzle[r][c] = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
 			System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
-		}		
+		}	
 	}
 	
 	/**
