@@ -20,8 +20,7 @@ public class SuperdokuController {
 	@FXML
 	private TextField txtCell;
 	
-	//An initialized 9x9 matrix
-	private int[][] puzzle =
+	private final int [][] INIT_PUZZLE =
 	{
 			{0, 0, 0 ,  0, 0, 0,   0, 0, 0},
 			{0, 0, 0,   0, 0, 0,   0, 0, 0},
@@ -36,8 +35,12 @@ public class SuperdokuController {
 			{0, 0, 0,   0, 0, 0,   0, 0, 0},
 	};
 	
+	//An initialized 9x9 matrix
+	private int[][] puzzle;
+	
 	public SuperdokuController(){
 		Superdoku.stage.setResizable(false);
+		puzzle = INIT_PUZZLE;
 	}
 	
 	/**
@@ -45,7 +48,7 @@ public class SuperdokuController {
 	 * Once btnSolve is clicked, the input cells are validated and parsed into a 
 	 * 9x9 matrix to be used as input for the remainder of the solution process.
 	 * */
-	public void parseAndSolve(){
+	public void solveClick(){
 		long startTime, endTime;
 		
 		System.out.println("Here is the problem:\n");
@@ -61,6 +64,14 @@ public class SuperdokuController {
 		
 		endTime = System.currentTimeMillis();
 		System.out.println("Solution took " + (endTime - startTime) + " millisecond(s) to derive.");
+	}
+	
+	/**
+	 * 
+	 * */
+	public void newPuzzleClick(){
+		puzzle = INIT_PUZZLE; 
+		System.out.println("Puzzle initialized");
 	}
 	
 	/**
