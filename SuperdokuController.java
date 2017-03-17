@@ -21,11 +21,11 @@ public class SuperdokuController {
 	private TextField txtCell;
 	
 	//An initialized 9x9 matrix
-	private int[][] puzzle;
+	private int[][] sudokuPuzzle;
 	
 	public SuperdokuController(){
 		Superdoku.stage.setResizable(false);
-		puzzle = new int[9][9];
+		sudokuPuzzle = new int[9][9];
 		initializePuzzle();
 	}
 	
@@ -56,9 +56,9 @@ public class SuperdokuController {
 	 * 
 	 * */
 	public void initializePuzzle(){
-		for(int x = 0; x < puzzle.length; x++){
-			for(int y = 0; y < puzzle[x].length; y++){
-				puzzle[x][y] = 0;
+		for(int x = 0; x < sudokuPuzzle.length; x++){
+			for(int y = 0; y < sudokuPuzzle[x].length; y++){
+				sudokuPuzzle[x][y] = 0;
 			}	
 		}
 		
@@ -86,7 +86,7 @@ public class SuperdokuController {
 			int r = Character.getNumericValue(cellID.charAt(0));
 			int c = Character.getNumericValue(cellID.charAt(1));
 			
-			puzzle[r][c] = Integer.parseInt(cell.getText());			
+			sudokuPuzzle[r][c] = Integer.parseInt(cell.getText());			
 		}
 	}
 	
@@ -117,11 +117,11 @@ public class SuperdokuController {
 		//The character to determine formatting
 		String d;
 		
-		for(int x = 0; x < puzzle.length; x++){			
-			for(int y = 0; y < puzzle[x].length; y++){	
+		for(int x = 0; x < sudokuPuzzle.length; x++){			
+			for(int y = 0; y < sudokuPuzzle[x].length; y++){	
 				//Print out a divider every third line
 				d = (y % 3 == 0) ? "\t" : " ";
-				System.out.print(d + puzzle[x][y]);				
+				System.out.print(d + sudokuPuzzle[x][y]);				
 			}	
 			
 			d = ((x + 1) % 3 == 0) ? "\n" : "";
@@ -139,28 +139,28 @@ public class SuperdokuController {
 	 * */
 	public void solvePuzzle(int row, int col){
 		
-		if(col > puzzle[row].length - 1){
+		if(col > sudokuPuzzle[row].length - 1){
 			col = 0;
 			row++;
 		}
 		
 		//Puzzle solved (we reached the last cell without any errors)
-		if(row > puzzle.length - 1 || isSolved){
+		if(row > sudokuPuzzle.length - 1 || isSolved){
 			isSolved = true;
 			return;
 		}		
 		
-		if(puzzle[row][col] == 0){
+		if(sudokuPuzzle[row][col] == 0){
 			//Try each number 1-9 until it satisfies all three rules
 			for(int num = 1; num <= 9; num++){	
 				if(followsRowRule(row, num) && followsColRule(col, num) && followsSquareRule(row, col, num)){
-					puzzle[row][col] = num;
+					sudokuPuzzle[row][col] = num;
 					solvePuzzle(row, col + 1);	
 					
 					if(isSolved) 
 						return;	
 					
-					puzzle[row][col] = 0;
+					sudokuPuzzle[row][col] = 0;
 				}
 			}		
 		}else{
@@ -179,9 +179,9 @@ public class SuperdokuController {
 	 * @return whether the number to be inserted is valid or not
 	 * */
 	public boolean followsRowRule(int row, int num){
-		for(int y = 0; y < puzzle[row].length; y++){
+		for(int y = 0; y < sudokuPuzzle[row].length; y++){
 			//If a number in the row already exists then the number in question does not satisfy the row rule
-			if(puzzle[row][y] == num){
+			if(sudokuPuzzle[row][y] == num){
 				return false;
 			}
 		}
@@ -197,9 +197,9 @@ public class SuperdokuController {
 	 * @return whether the number to be inserted is valid or not
 	 * */
 	public boolean followsColRule(int col, int num){
-		for(int x = 0; x < puzzle.length; x++){
+		for(int x = 0; x < sudokuPuzzle.length; x++){
 			//If a number in the column already exists then the number in question does not satisfy the column rule
-			if(puzzle[x][col] == num){
+			if(sudokuPuzzle[x][col] == num){
 				return false;
 			}
 		}
@@ -239,7 +239,7 @@ public class SuperdokuController {
 		for(int x = xStart; x < xStart + 3; x++){
 			for(int y = yStart; y < yStart + 3; y++){				
 				if(x!= row && y!= col){
-					if(puzzle[x][y] == num){
+					if(sudokuPuzzle[x][y] == num){
 						return false;
 					}
 				}
