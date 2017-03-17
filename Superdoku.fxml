@@ -129,7 +129,7 @@
                         </Lighting>
                      </effect></Separator>
                   <Button fx:id="btnSolve" layoutX="66.0" layoutY="374.0" mnemonicParsing="false" onAction="#solveClick" prefHeight="25.0" prefWidth="96.0" text="Solve!" />
-                  <Button fx:id="btnNew" layoutX="197.0" layoutY="374.0" mnemonicParsing="false" onAction="#newPuzzleClick" prefHeight="25.0" prefWidth="96.0" text="New Puzzle" />
+                  <Button fx:id="btnNew" layoutX="197.0" layoutY="374.0" mnemonicParsing="false" onAction="#initializePuzzle" prefHeight="25.0" prefWidth="96.0" text="New Puzzle" />
                </children></AnchorPane>
       </content>
     </Tab>

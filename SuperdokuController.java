@@ -20,27 +20,13 @@ public class SuperdokuController {
 	@FXML
 	private TextField txtCell;
 	
-	private final int [][] INIT_PUZZLE =
-	{
-			{0, 0, 0 ,  0, 0, 0,   0, 0, 0},
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-			{0, 0, 0,   0, 0, 0,   0, 0, 0},
-	};
-	
 	//An initialized 9x9 matrix
 	private int[][] puzzle;
 	
 	public SuperdokuController(){
 		Superdoku.stage.setResizable(false);
-		puzzle = INIT_PUZZLE;
+		puzzle = new int[9][9];
+		initializePuzzle();
 	}
 	
 	/**
@@ -69,9 +55,16 @@ public class SuperdokuController {
 	/**
 	 * 
 	 * */
-	public void newPuzzleClick(){
-		puzzle = INIT_PUZZLE; 
+	public void initializePuzzle(){
+		for(int x = 0; x < puzzle.length; x++){
+			for(int y = 0; y < puzzle[x].length; y++){
+				puzzle[x][y] = 0;
+			}	
+		}
+		
 		System.out.println("Puzzle initialized");
+		
+		displayPuzzle();
 	}
 	
 	/**
