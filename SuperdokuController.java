@@ -5,12 +5,68 @@
 
 package application;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+
 public class SuperdokuController {
 	
 	private boolean isSolved;
 	
+	@FXML
+	private Button btnSolve;
+	
+	@FXML
+	private TextField txtCell;
+	
+	private int[][] puzzle;
+	
 	public SuperdokuController(){
 		Superdoku.stage.setResizable(false);
+		puzzle = new int[9][9];
+	}
+	
+	/**
+	 * This method acts as an action listener for the solve button
+	 * Once btnSolve is clicked, the input cells are validated and parsed into a 
+	 * 9x9 matrix to be used as input for the remainder of the solution process.
+	 * */
+	public void parseAndSolve(){
+		System.out.println("Solve button pressed!");
+	}
+	
+	/**
+	 * 
+	 * */
+	public void getInput(KeyEvent event){
+		//Get the cell id from the event source
+		String cellID = event.getSource().toString().substring(16, 18);	
+		
+		//Get the contents of the cell in which the data was entered
+		TextField cell = (TextField)event.getSource();
+		
+		validateTextField(cell);
+		
+		System.out.println(cell.getText() + " was entered for row: " + cellID.charAt(0) + " column: " + cellID.charAt(1));
+	}
+	
+	/**
+	 * 
+	 * */
+	private void validateTextField(TextField cell){
+		for(char c : cell.getText().toCharArray()){
+			if(Character.isAlphabetic(c) || c == '0'){
+				cell.clear();
+				return;
+			}
+		}
+		
+		int cellVal = Integer.parseInt(cell.getText());
+		
+		if(cellVal < 0 || cellVal > 9){
+			cell.clear();
+		}
 	}
 	
 	/**
