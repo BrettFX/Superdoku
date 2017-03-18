@@ -170,7 +170,7 @@ public class SuperdokuController {
 			
 			d = ((x + 1) % 3 == 0) ? "\n" : "";
 			System.out.println(d);
-		}
+		}		
 	}
 	
 	/**
@@ -208,7 +208,7 @@ public class SuperdokuController {
 				}
 			}		
 		}else{
-			//There was an error. We must go back and correct it
+			//Skip cells that already have numbers 1-9
 			solvePuzzle(row, col + 1);
 		}
 					
