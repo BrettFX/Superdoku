@@ -61,7 +61,8 @@ public class SuperdokuController {
 	}
 	
 	/**
-	 * 
+	 * Sets all contents of the sudokuPuzzle to zero and clears all text fields as long as
+	 * they are loaded
 	 * */
 	public void initializePuzzle(){
 		for(int x = 0; x < sudokuPuzzle.length; x++){
@@ -91,7 +92,10 @@ public class SuperdokuController {
 	}
 	
 	/**
+	 * Parses the contents from within an input cell and inserts it into the respective 
+	 * grid location of the sudokuPuzzle
 	 * 
+	 * @param event the specific key event bound by its respective cell; used to get the text field id 
 	 * */
 	public void getInput(KeyEvent event){
 		System.out.println(event.getCode().toString());
@@ -116,7 +120,8 @@ public class SuperdokuController {
 	}
 	
 	/**
-	 * 
+	 * Traverses a text field and validates whether the contents are only numbers
+	 * between one and nine
 	 * */
 	private void validateTextField(TextField cell){
 		for(char c : cell.getText().toCharArray()){
