@@ -27,9 +27,9 @@ public class Superdoku extends Application {
 			Parent root = (Parent)loader.load();
 			SuperdokuController controller = (SuperdokuController)loader.getController();
 			controller.initialize(primaryStage);			
-		    Scene scene = new Scene(root);
-		    primaryStage.setScene(scene);
-		    primaryStage.show();
+			Scene scene = new Scene(root);
+			primaryStage.setScene(scene);
+			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
