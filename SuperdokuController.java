@@ -51,6 +51,7 @@ public class SuperdokuController {
 		primaryStage = stage;
 		primaryStage.setResizable(false);
 		primaryStage.setTitle(TITLE);
+		
 		sudokuPuzzle = new int[9][9];		
 		initializePuzzle();
 		
@@ -61,8 +62,7 @@ public class SuperdokuController {
 		txtFieldMap = new HashMap<String, TextField>();
 		
 		//Populate the txtFieldMap
-		for(int nodeIndex = 0; nodeIndex < obsList.size(); nodeIndex++){
-			Node node = obsList.get(nodeIndex); 
+		for(Node node : obsList){
 			if(node instanceof TextField){				
 				txtFieldMap.put(((TextField)node).getId(), (TextField)node);
 			}
