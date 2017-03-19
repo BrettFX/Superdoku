@@ -14,8 +14,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 public class SuperdokuController {
+	
+	private static final String TITLE = "Superdoku: SuDoKu Solver";
 	
 	private boolean isSolved;
 	
@@ -31,10 +34,39 @@ public class SuperdokuController {
 	//An initialized 9x9 matrix
 	private int[][] sudokuPuzzle;
 	
-	public SuperdokuController(){
-		Superdoku.stage.setResizable(false);
+	private Stage primaryStage;
+	
+	//Stores all children that belong to the superdokuAnchor
+	private ObservableList<Node> obsList;
+	
+	//Stores the text fields residing within the superdokuAnchor: TextField IDs are used as the keys
+	private HashMap<String, TextField> txtFieldMap;
+	
+	/**
+	 * Initializes the SuperdokuController class. This method acts in place of the constructor
+	 * 
+	 * @param stage the primaryStage
+	 * */
+	public void initialize(Stage stage){
+		primaryStage = stage;
+		primaryStage.setResizable(false);
+		primaryStage.setTitle(TITLE);
 		sudokuPuzzle = new int[9][9];		
 		initializePuzzle();
+		
+		//Getting text field based on id
+		obsList = superdokuAnchor.getChildren();
+		
+		//Create a HashMap to reference the text fields
+		txtFieldMap = new HashMap<String, TextField>();
+		
+		//Populate the txtFieldMap
+		for(int nodeIndex = 0; nodeIndex < obsList.size(); nodeIndex++){
+			Node node = obsList.get(nodeIndex); 
+			if(node instanceof TextField){				
+				txtFieldMap.put(((TextField)node).getId(), (TextField)node);
+			}
+		}
 	}
 	
 	/**
@@ -147,20 +179,6 @@ public class SuperdokuController {
 
 		//The character to determine formatting
 		String d;
-		
-		//Getting text field based on id
-		ObservableList<Node> obsList = superdokuAnchor.getChildren();
-		
-		//Create a HashMap to reference the text fields
-		HashMap<String, TextField> txtFieldMap = new HashMap<String, TextField>();
-		
-		//Populate the txtFieldMap
-		for(int nodeIndex = 0; nodeIndex < obsList.size(); nodeIndex++){
-			Node node = obsList.get(nodeIndex); 
-			if(node instanceof TextField){				
-				txtFieldMap.put(((TextField)node).getId(), (TextField)node);
-			}
-		}
 		
 		//Use the values from the sudokuPuzzle and write them to the respective cell using the txtFieldMap
 		for(int x = 0; x < sudokuPuzzle.length; x++){			

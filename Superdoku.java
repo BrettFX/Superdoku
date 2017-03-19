@@ -19,16 +19,17 @@ import javafx.stage.Stage;
 
 public class Superdoku extends Application {
 	
-	public static Stage stage;
-	
 	@Override
 	public void start(Stage primaryStage) {
+		
 		try {
-			stage = primaryStage;			
-			Parent root = FXMLLoader.load(getClass().getResource("Superdoku.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("Superdoku.fxml"));
+			Parent root = (Parent)loader.load();
+			SuperdokuController controller = (SuperdokuController)loader.getController();
+			controller.initialize(primaryStage);			
 		    Scene scene = new Scene(root);
-		    stage.setScene(scene);
-		    stage.show();
+		    primaryStage.setScene(scene);
+		    primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
