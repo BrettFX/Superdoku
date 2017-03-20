@@ -11,6 +11,8 @@
 
 package application;
 
+import com.aquafx_project.AquaFx;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,14 +24,15 @@ public class Superdoku extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		
-		try {
+		try {			
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("Superdoku.fxml"));
 			Parent root = (Parent)loader.load();
 			SuperdokuController controller = (SuperdokuController)loader.getController();
 			controller.initialize(primaryStage);			
-			Scene scene = new Scene(root);
-			primaryStage.setScene(scene);
+			Scene scene = new Scene(root);			
+			primaryStage.setScene(scene);			
 			primaryStage.show();
+			AquaFx.style();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
