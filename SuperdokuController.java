@@ -118,6 +118,7 @@ public class SuperdokuController {
 			for(Node node : superdokuAnchor.getChildren()){				
 				if(node instanceof TextField){
 					((TextField)node).clear();
+					((TextField)node).setEditable(true);
 				}
 			}
 		}
@@ -141,9 +142,10 @@ public class SuperdokuController {
 		int r = Character.getNumericValue(cellID.charAt(0));
 		int c = Character.getNumericValue(cellID.charAt(1));
 		
+		validateTextField(cell);
+		
 		//No need to validate if the user is deleting an entry			
-		if(event.getCode().toString().contains("NUMPAD") ||  event.getCode().toString().contains("DIGIT")){
-			validateTextField(cell);
+		if(event.getCode().toString().contains("NUMPAD") ||  event.getCode().toString().contains("DIGIT")){		
 			
 			//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
 			sudokuPuzzle[r][c] = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
@@ -185,6 +187,7 @@ public class SuperdokuController {
 			for(int y = 0; y < sudokuPuzzle[x].length; y++){	
 				TextField tf = txtFieldMap.get("txt" + x + "" + y);				
 				tf.setText(sudokuPuzzle[x][y] + "");
+				tf.setEditable(false);
 				
 				//Print out a divider every third line
 				d = (y % 3 == 0) ? "\t" : " ";
