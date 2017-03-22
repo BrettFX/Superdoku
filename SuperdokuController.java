@@ -131,7 +131,7 @@ public class SuperdokuController {
 	 * @param event the specific key event bound by its respective cell; used to get the text field id 
 	 * */
 	public void getInput(KeyEvent event){
-		System.out.println(event.getCode().toString());
+		int input = 0;
 		
 		//Get the cell id from the event source
 		String cellID = event.getSource().toString().substring(16, 18);	
@@ -142,15 +142,42 @@ public class SuperdokuController {
 		int r = Character.getNumericValue(cellID.charAt(0));
 		int c = Character.getNumericValue(cellID.charAt(1));
 		
-		validateTextField(cell);
-		
 		//No need to validate if the user is deleting an entry			
-		if(event.getCode().toString().contains("NUMPAD") ||  event.getCode().toString().contains("DIGIT")){		
+		if(event.getCode().toString().contains("NUMPAD") ||  event.getCode().toString().contains("DIGIT")){
 			
-			//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
-			sudokuPuzzle[r][c] = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
-			System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
-		}	
+			validateTextField(cell);
+			
+			input = !cell.getText().isEmpty() ? Integer.parseInt(cell.getText()) : 0;
+			
+			//Make sure the input satisfies the three rules
+			if(followsRowRule(r, input) && followsColRule(c, input) && followsSquareRule(r, c, input)){
+				//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
+				sudokuPuzzle[r][c] = input;
+				System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
+			}else{
+				System.err.println("Number cannot be placed at cell location due to conflicting with one or more of the rules");
+				cell.clear();
+				sudokuPuzzle[r][c] = 0;
+			}
+		}else{
+			String eventCode = event.getCode().toString();	
+			TextField tf = cell;
+			
+			//Permit use of the directional keys in order to move from one cell to the next using the arrow keys
+			if(eventCode.contains("RIGHT")){
+				tf = c < 8 ? txtFieldMap.get("txt" + cellID.charAt(0) + (c + 1)) : txtFieldMap.get("txt" + cellID.charAt(0) + "0");
+			}else if(eventCode.contains("LEFT")){
+				tf = c > 0 ? txtFieldMap.get("txt" + cellID.charAt(0) + (c - 1)) : txtFieldMap.get("txt" + cellID.charAt(0) + "8");
+			}else if(eventCode.contains("UP")){
+				tf = r > 0 ? txtFieldMap.get("txt" + (r - 1) + cellID.charAt(1)) : txtFieldMap.get("txt8" + cellID.charAt(1));
+			}else if(eventCode.contains("DOWN")){
+				tf = r < 8 ? txtFieldMap.get("txt" + (r + 1) + cellID.charAt(1)) : txtFieldMap.get("txt0" + cellID.charAt(1));
+			}else{
+				cell.clear();
+			}
+			
+			tf.requestFocus();
+		}
 	}
 	
 	/**
@@ -158,13 +185,6 @@ public class SuperdokuController {
 	 * between one and nine
 	 * */
 	private void validateTextField(TextField cell){
-		for(char c : cell.getText().toCharArray()){
-			if(Character.isAlphabetic(c) || c == '0'){
-				cell.clear();
-				return;
-			}
-		}
-		
 		int cellVal = Integer.parseInt(cell.getText());
 		
 		if(cellVal < 0 || cellVal > 9){
