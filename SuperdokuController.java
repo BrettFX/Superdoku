@@ -10,7 +10,6 @@ import java.util.HashMap;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -24,9 +23,6 @@ public class SuperdokuController {
 	
 	@FXML
 	private AnchorPane superdokuAnchor;
-	
-	@FXML
-	private Button btnSolve;
 	
 	@FXML
 	private TextField txtCell;
