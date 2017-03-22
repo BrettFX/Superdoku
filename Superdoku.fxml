@@ -133,10 +133,5 @@
                </children></AnchorPane>
       </content>
     </Tab>
-    <Tab fx:id="tabUpload" text="Upload">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-      </content>
-    </Tab>
   </tabs>
 </TabPane>
