@@ -164,6 +164,8 @@ public class SuperdokuController {
 			TextField tf = cell;
 			
 			//Permit use of the directional keys in order to move from one cell to the next using the arrow keys
+			//When the user hits one of the bounds and attempts to traverse further, the cursor will start at the beginning/end
+			//of the row/column depending on which direction the user is going (i.e. at (0, 8), go right, now at (0, 0).
 			if(eventCode.contains("RIGHT")){
 				tf = c < 8 ? txtFieldMap.get("txt" + cellID.charAt(0) + (c + 1)) : txtFieldMap.get("txt" + cellID.charAt(0) + "0");
 			}else if(eventCode.contains("LEFT")){
