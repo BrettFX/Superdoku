@@ -148,13 +148,15 @@ public class SuperdokuController {
 			//Make sure the input satisfies the three rules
 			if(followsRowRule(r, input) && followsColRule(c, input) && followsSquareRule(r, c, input)){
 				//Insert the number from extracted from the GUI to the puzzle if it is not empty and it is valid. Otherwise set the cell to zero		
-				sudokuPuzzle[r][c] = input;
-				System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
+				sudokuPuzzle[r][c] = input;				
 			}else{
 				System.err.println("Number cannot be placed at cell location due to conflicting with one or more of the rules");
 				cell.clear();
 				sudokuPuzzle[r][c] = 0;
 			}
+			
+			System.out.println("Set sudokuPuzzle[" + r + "][" + c + "] to " + sudokuPuzzle[r][c]);
+			
 		}else{
 			String eventCode = event.getCode().toString();	
 			TextField tf = cell;
