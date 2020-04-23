@@ -25,7 +25,7 @@ public class Superdoku extends Application {
 	public void start(Stage primaryStage) {
 		
 		try {			
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("Superdoku.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/Superdoku.fxml"));
 			Parent root = (Parent)loader.load();
 			SuperdokuController controller = (SuperdokuController)loader.getController();
 			controller.initialize(primaryStage);			
