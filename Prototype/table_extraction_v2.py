@@ -34,7 +34,7 @@ if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = tess_path
 
 #read your file
-file=r'Images/datasheet_sample.png'
+file=r'Images/1.png'
 img = cv2.imread(file,0)
 img.shape
 
