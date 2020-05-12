@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Superdoku
 {
@@ -8,9 +9,6 @@ namespace Superdoku
     {
         [Header("Cells")]
         public GameObject[] cells;
-
-        private GameObject m_currActiveCell;
-        private GameObject m_prevActiveCell;
 
         // Start is called before the first frame update
         void Start()
@@ -22,11 +20,6 @@ namespace Superdoku
         void Update()
         {
 
-        }
-
-        public void OnCellSelected(GameObject cell) 
-        {
-            Debug.Log("Selected cell: " + cell);
         }
     }
 }
