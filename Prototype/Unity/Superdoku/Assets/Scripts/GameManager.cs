@@ -12,7 +12,15 @@ namespace Superdoku
         private static GameManager instance;
         public static GameManager Instance { get { return instance; } }
 
-        private string m_currActiveCellName;
+        [Header("Cell Management")]
+        public Color defaultColor = Color.white;
+        public Color selectionColor = Color.blue;
+
+        private bool m_selected = false;
+
+        private Color[] m_colorWheel;
+
+        private static GameObject m_currentActiveCell;
 
         void Awake()
         {
@@ -38,7 +46,12 @@ namespace Superdoku
         // Start is called before the first frame update
         void Start()
         {
-
+            // Selection color wheel for toggling between selected and deselected
+            m_colorWheel = new Color[2]
+            {
+                defaultColor,
+                selectionColor
+            };
         }
 
         // Update is called once per frame
@@ -50,29 +63,26 @@ namespace Superdoku
         public void OnCellSelected(GameObject cell)
         {
             Debug.Log("Selected cell: " + cell.name);
-            this.m_currActiveCellName = cell.name;
+
+            Button button = cell.GetComponent<Button>();
+            m_currentActiveCell = cell;
         }
 
         public void OnNumberClicked(GameObject button)
         {
             // Grab the respective number value of the clicked button
-            NumberButton numberButton = button.GetComponent<NumberButton>();
-            Debug.Log("Button clicked: " + numberButton.value);
+            Text buttonText = button.GetComponentInChildren<Text>();
 
             // Set the text of the currently selected input field based on the number that has been clicked
-            if (this.m_currActiveCellName != null)
+            if (m_currentActiveCell != null)
             {
-                // Lookup by name
-                GameObject gameObject = GameObject.Find(this.m_currActiveCellName);
-                InputField targetInputField = gameObject.GetComponentInChildren<InputField>();
+                Button targetCell = m_currentActiveCell.GetComponent<Button>();
+                Debug.Log(targetCell);
 
-                Debug.Log(gameObject);
-                Debug.Log(targetInputField);
+                targetCell.GetComponentInChildren<Text>().text = buttonText.text;
 
-                targetInputField.text = numberButton.value.ToString();
-
-                // Highlight the input field again since it lost focus
-                targetInputField.ActivateInputField();
+                // Highlight the target cell since it lost focus
+                targetCell.Select();
             }
             else
             {
@@ -100,6 +110,23 @@ namespace Superdoku
                 // To remove hilight we'll just show the caret at the end of the line
                 inputField.MoveTextEnd(false);
             }
+        }
+
+        /**
+        * Toggle the selection color of a game object based on two colors to cycle between
+        * @param GameObject obj the game object to extract the renderer from and alter the material color
+        */
+        private void ToggleSelectionColor(GameObject obj)
+        {
+            // Toggle selection state (change before processing for onClick change)
+            m_selected = !m_selected;
+
+            // Choose the respective color from the color wheel based on the selection state
+            Color color = m_colorWheel[m_selected ? 1 : 0];
+
+            // Obtain the renderer from the game object and set its material color
+            Renderer rend = obj.GetComponent<Renderer>();
+            rend.material.color = color;
         }
     }
 }

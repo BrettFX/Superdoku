@@ -37,13 +37,15 @@ namespace Superdoku
                 {
                     if (hit.transform != null)
                     {
-                        //Debug.Log("Clicked: " + hit.transform.gameObject.name);
+                        // Only respond to cells
+                        if (hit.transform.gameObject.tag.Equals("Cell"))
+                        {
+                            // Change material color on click
+                            ToggleSelectionColor(hit.transform.gameObject);
 
-                        // Change material color on click
-                        ToggleSelectionColor(hit.transform.gameObject);
-
-                        // Delegate to the on cell select function defined in game manager
-                        GameManager.Instance.OnCellSelected(hit.transform.gameObject);
+                            // Delegate to the on cell select function defined in game manager
+                            GameManager.Instance.OnCellSelected(hit.transform.gameObject);
+                        }
                     }
                 }
             }
