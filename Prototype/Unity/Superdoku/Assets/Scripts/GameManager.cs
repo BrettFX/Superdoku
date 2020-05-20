@@ -81,6 +81,9 @@ namespace Superdoku
 
                 targetCell.GetComponentInChildren<Text>().text = buttonText.text;
 
+                // TODO change respective element value of 2d sudoku array (e.g., bind cells to elements)
+
+
                 // Highlight the target cell since it lost focus
                 targetCell.Select();
             }
@@ -88,6 +91,22 @@ namespace Superdoku
             {
                 Debug.Log("Must select a cell first!");
             }
+        }
+
+        public void OnSolve()
+        {
+            Debug.Log("Solving puzzle...");
+
+            // Deselect current active cell
+            m_currentActiveCell = null;
+        }
+
+        public void OnCamera()
+        {
+            Debug.Log("Launching camera scene...");
+
+            // Deselect current active cell
+            m_currentActiveCell = null;
         }
 
         // See: https://forum.unity.com/threads/unity-4-6-ui-how-to-prevent-deselect-losing-focus-in-inputfield.272387/
