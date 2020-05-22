@@ -53,7 +53,7 @@ namespace Superdoku
         // Update is called once per frame
         void Update()
         {
-            // Keep the sudoku puzzle integer 2d array in sync with ui cells
+            // TODO Keep the sudoku puzzle integer 2d array in sync with ui cells
 
         }
 

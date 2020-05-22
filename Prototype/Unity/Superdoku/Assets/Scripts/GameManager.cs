@@ -77,7 +77,8 @@ namespace Superdoku {
 
 				targetCell.GetComponentInChildren < Text > ().text = buttonText.text;
 
-				// TODO change respective element value of 2d sudoku array (e.g., bind cells to elements)
+                // TODO Highlight cell color as red if it's not a valid number according to Sudoku rules
+                //ValidateInput();
 
 				// Highlight the target cell since it lost focus
 				targetCell.Select();
