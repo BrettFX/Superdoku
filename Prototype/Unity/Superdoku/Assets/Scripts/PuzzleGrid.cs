@@ -53,18 +53,41 @@ namespace Superdoku
         // Update is called once per frame
         void Update()
         {
-            // TODO Keep the sudoku puzzle integer 2d array in sync with ui cells
+            // Keep the sudoku puzzle integer 2d array in sync with ui cells
             for (int row = 0; row < cellRows.Length; row++)
             {
                 Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
 
                 for (int col = 0; col < cellButtons.Length; col++)
                 {
-                    string btnText = cellButtons[col].GetComponentInChildren<Text>().text;
+                    Button cellButton = cellButtons[col];
+                    string btnText = cellButton.GetComponentInChildren<Text>().text;
 
                     // Get integer representation
                     int btnValue = btnText.Equals("") ? 0 : Convert.ToInt32(btnText);
                     sudokuPuzzle[row, col] = btnValue;
+
+                    // Only validate cells that aren't blank
+                    if (btnValue != 0)
+                    {
+                        // Reference respective button colors
+                        ColorBlock colors = cellButton.colors;
+                        if (FollowsRowRule(row, col, btnValue) && FollowsColRule(col, row, btnValue) && FollowsSquareRule(row, col, btnValue))
+                        {
+                            // Revert back to default colors as needed
+                            GameManager.Instance.SetButtonColor(cellButton, true);
+                        }
+                        else
+                        {
+                            // Highlight invalid cells accordingly
+                            GameManager.Instance.SetButtonColor(cellButton, false);
+                        }
+                    }
+                    else
+                    {
+                        // Revert back to default colors as needed (handles cornercase of clearing when formally invalid)
+                        GameManager.Instance.SetButtonColor(cellButton, true);
+                    }
                 }
             }
         }        
@@ -73,15 +96,16 @@ namespace Superdoku
 	    * Determines if the number to be inserted has not already been used in the current row
 	    * 
 	    * @param row the row to be determined if the number to be inserted is valid
+        * @param col the column used to pin-point the exact coordinate location of the cell
 	    * @param num the number to determine is valid
 	    * @return whether the number to be inserted is valid or not
 	    * */
-        public bool FollowsRowRule(int row, int num)
+        public bool FollowsRowRule(int row, int col, int num)
         {
             for (int y = 0; y < 9; y++)
             {
                 //If a number in the row already exists then the number in question does not satisfy the row rule
-                if (sudokuPuzzle[row, y] == num)
+                if (sudokuPuzzle[row, y] == num && y != col)
                 {
                     return false;
                 }
@@ -93,15 +117,16 @@ namespace Superdoku
          * Determines if the number to be inserted has not already been used in the current column
          * 
          * @param col the column of the puzzle to be determined if valid
+         * @param row the row provided as a means to pin-point the exact coordinate location of the cell
          * @param num the number to determine is valid
          * @return whether the number to be inserted is valid or not
          * */
-        public bool FollowsColRule(int col, int num)
+        public bool FollowsColRule(int col, int row, int num)
         {
             for (int x = 0; x < 9; x++)
             {
                 //If a number in the column already exists then the number in question does not satisfy the column rule
-                if (sudokuPuzzle[x, col] == num)
+                if (sudokuPuzzle[x, col] == num && x != row)
                 {
                     return false;
                 }
@@ -194,7 +219,7 @@ namespace Superdoku
                 //Try each number 1-9 until it satisfies all three rules
                 for (int num = 1; num <= 9; num++)
                 {
-                    if (FollowsRowRule(row, num) && FollowsColRule(col, num) && FollowsSquareRule(row, col, num))
+                    if (FollowsRowRule(row, col, num) && FollowsColRule(col, row, num) && FollowsSquareRule(row, col, num))
                     {
                         sudokuPuzzle[row, col] = num;
                         SolvePuzzle(row, col + 1);
