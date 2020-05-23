@@ -59,7 +59,19 @@ namespace Superdoku {
 
         }
 
-		public void OnCellSelected(GameObject cell) {
+        /**
+	    * Sets all contents of the sudokuPuzzle to zero and clears all text fields as long as
+	    * they are loaded
+	    * */
+        public void InitializePuzzle()
+        {
+            m_currentActiveCell = null;
+            PuzzleGrid.Instance.Clear();
+            SetSolved(false);
+            Debug.Log("Puzzle initialized");
+        }
+
+        public void OnCellSelected(GameObject cell) {
 			Debug.Log("Selected cell: " + cell.name);
 
 			Button button = cell.GetComponent < Button > ();
@@ -90,12 +102,12 @@ namespace Superdoku {
 		public void OnSolve() {
 			Debug.Log("Solving puzzle...");
 
-            long startTime, endTime;
+            float startTime, endTime;
 
             Debug.Log("Here is the problem:\n");
             PuzzleGrid.Instance.Show();
 
-            startTime = (long)(Time.deltaTime * 1000);
+            startTime = Time.deltaTime * 1000;
 
             //Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
             PuzzleGrid.Instance.SolvePuzzle(0, 0);
@@ -103,7 +115,7 @@ namespace Superdoku {
             Debug.Log("\nHere is the solution:\n");
             PuzzleGrid.Instance.Show();
 
-            endTime = (long)(Time.deltaTime * 1000);
+            endTime = Time.deltaTime * 1000;
             Debug.Log("Solution took " + (endTime - startTime) + " millisecond(s) to derive.");
 
             // Deselect current active cell
@@ -127,39 +139,11 @@ namespace Superdoku {
 			m_currentActiveCell = null;
 		}
 
-		// See: https://forum.unity.com/threads/unity-4-6-ui-how-to-prevent-deselect-losing-focus-in-inputfield.272387/
-		void ReactivateInputField(InputField inputField) {
-			if (inputField != null) {
-				StartCoroutine(ActivateInputFieldWithoutSelection(inputField));
-			}
-		}
-
-		IEnumerator ActivateInputFieldWithoutSelection(InputField inputField) {
-			inputField.ActivateInputField();
-			// wait for the activation to occur in a lateupdate
-			yield
-			return new WaitForEndOfFrame();
-			// make sure we're still the active ui
-			if (EventSystem.current.currentSelectedGameObject == inputField.gameObject) {
-				// To remove hilight we'll just show the caret at the end of the line
-				inputField.MoveTextEnd(false);
-			}
-		}
-
 		/**
         * Clears all the text field cells in the 9x9 matrix
         * */
-		public void ClearCells() {
-			m_currentActiveCell = null;
-
-
-			//if (superdokuAnchor != null) {
-			//	for (Node node: superdokuAnchor.getChildren()) {
-			//		if (node instanceof TextField) { ((TextField) node).clear();
-			//			((TextField) node).setEditable(true);
-			//		}
-			//	}
-			//}
+		public void OnClearCells() {
+            InitializePuzzle();
 		}
 
 		/**

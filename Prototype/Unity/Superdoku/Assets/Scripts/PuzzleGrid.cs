@@ -47,41 +47,31 @@ namespace Superdoku
         void Start()
         {
             sudokuPuzzle = new int[9,9];
-            InitializePuzzle();
+            GameManager.Instance.InitializePuzzle();
         }
 
         // Update is called once per frame
         void Update()
         {
             // TODO Keep the sudoku puzzle integer 2d array in sync with ui cells
-
-        }
-
-        /**
-	    * Sets all contents of the sudokuPuzzle to zero and clears all text fields as long as
-	    * they are loaded
-	    * */
-        public void InitializePuzzle()
-        {
-            for (int x = 0; x < 9; x++)
+            for (int row = 0; row < cellRows.Length; row++)
             {
-                for (int y = 0; y < 9; y++)
+                Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
+
+                for (int col = 0; col < cellButtons.Length; col++)
                 {
-                    sudokuPuzzle[x, y] = 0;
+                    string btnText = cellButtons[col].GetComponentInChildren<Text>().text;
+
+                    // Get integer representation
+                    int btnValue = btnText.Equals("") ? 0 : Convert.ToInt32(btnText);
+                    sudokuPuzzle[row, col] = btnValue;
                 }
             }
-
-            GameManager.Instance.ClearCells();
-
-            GameManager.Instance.SetSolved(false);
-
-            Debug.Log("Puzzle initialized");
-        }
+        }        
 
         /**
 	    * Determines if the number to be inserted has not already been used in the current row
 	    * 
-	    * @param p the two-dimensional 9x9 puzzle
 	    * @param row the row to be determined if the number to be inserted is valid
 	    * @param num the number to determine is valid
 	    * @return whether the number to be inserted is valid or not
@@ -102,7 +92,6 @@ namespace Superdoku
         /**
          * Determines if the number to be inserted has not already been used in the current column
          * 
-         * @param p the two-dimensional 9x9 puzzle
          * @param col the column of the puzzle to be determined if valid
          * @param num the number to determine is valid
          * @return whether the number to be inserted is valid or not
@@ -125,7 +114,6 @@ namespace Superdoku
          * Determines if the number to be inserted has not already been used in the 3x3 subspace
          * that the current cell lives in
          * 
-         * @param p the two-dimensional 9x9 puzzle
          * @param row the row in the 3x3 subspace of the puzzle to be determined if valid
          * @param col the column in the 3x3 subspace of the puzzle to be determined if valid
          * @param num the number to determine is valid
@@ -182,7 +170,6 @@ namespace Superdoku
 	    * Driver method to solve the SuDoKu puzzle.
 	    * Recursively determines the correct numbers for each cell
 	    * 
-	    * @param the two-dimensional 9x9 puzzle to be solved 
 	    * @param row the current row within the 9x9 SuDoKu puzzle
 	    * @param col the current column  within the 9x9 SuDoKu puzzle
 	    * */
@@ -227,22 +214,51 @@ namespace Superdoku
 
         }
 
+        /**
+        * Clears the in-memory puzzle grid by setting each element to 0 and sets the text
+        * of UI grid cells to blank
+        */
+        public void Clear()
+        {  
+            for (int row = 0; row < cellRows.Length; row++)
+            {
+                Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
+
+                for (int col = 0; col < cellButtons.Length; col++)
+                {
+                    // Clear the respective UI cell and sudoku puzzle cell
+                    Text btnText = cellButtons[col].GetComponentInChildren<Text>();
+                    btnText.text = "";
+                    sudokuPuzzle[row, col] = 0;
+                }
+            }
+        }
+
+        /**
+        * Display the Sudoku puzzle based on the current values of the 2d integer array
+        * representation. Update the UI grid cells.
+        */
         public void Show()
         {
             // String to build while iterating sudoku puzzle for displaying/logging
             string display = "";
 
-            //Use the values from the sudokuPuzzle and write them to the respective cell using the txtFieldMap
-            for (int x = 0; x < 9; x++)
+            for (int row = 0; row < cellRows.Length; row++)
             {
+                Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
                 display += "\n";
-                for (int y = 0; y < 9; y++)
+                for (int col = 0; col < cellButtons.Length; col++)
                 {
+                    // Set the cell grid ui text to the respective cell value from 2d int array
+                    Text btnText = cellButtons[col].GetComponentInChildren<Text>();
+                    int cellVal = sudokuPuzzle[row, col];
+                    btnText.text = cellVal == 0 ? "" : cellVal.ToString(); // Display 0 as an empty string
+
                     // Print out a divider every third line
-                    display += ((y % 3 == 0) ? "\t" : " ") + sudokuPuzzle[x, y].ToString();
+                    display += ((col % 3 == 0) ? "\t" : " ") + sudokuPuzzle[row, col].ToString();
                 }
 
-                display += ((x + 1) % 3 == 0) ? "\n" : "";
+                display += ((row + 1) % 3 == 0) ? "\n" : "";
             }
 
             Debug.Log(display);
