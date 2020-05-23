@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Superdoku
 {
-    [Serializable]
-    public class Row
-    {
-        public GameObject[] rowdata;
-    }
-
     public class PuzzleGrid : MonoBehaviour
     {
         private static PuzzleGrid instance;
@@ -22,6 +14,9 @@ namespace Superdoku
         public GameObject[] cellRows;
         private int[,] sudokuPuzzle;
 
+        /**
+         * Ensure this class remains a singleton instance
+         * */
         void Awake()
         {
             // If the instance variable is already assigned...
@@ -46,6 +41,7 @@ namespace Superdoku
         // Start is called before the first frame update
         void Start()
         {
+            // Initialize the sudoku puzzle
             sudokuPuzzle = new int[9,9];
             GameManager.Instance.InitializePuzzle();
         }
@@ -286,7 +282,7 @@ namespace Superdoku
                 display += ((row + 1) % 3 == 0) ? "\n" : "";
             }
 
-            Debug.Log(display);
+            if (GameManager.Instance.DEBUG_MODE) { Debug.Log(display); }
         }
     }
 }
