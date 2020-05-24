@@ -55,6 +55,9 @@ namespace Superdoku
             string testFile = "/test_" + time + ".png";
             if (GameManager.WriteFile(OUTPUT_DIR, testFile, bytes, FileMode.Create))
             {
+                // Save output file to player prefs so it can be referenced in image processor scene
+                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, OUTPUT_DIR + testFile);
+
                 if (GameManager.DEBUG_MODE)
                 {
                     Debug.Log("Successfully wrote to " + OUTPUT_DIR + testFile);

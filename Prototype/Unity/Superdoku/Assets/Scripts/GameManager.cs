@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -17,6 +18,7 @@ namespace Superdoku {
         public const bool DEBUG_MODE = true;
         public const int HOME_SCENE = 0;
         public const int WEB_CAM_SCENE = 1;
+        public const string IMAGE_PATH_KEY = "CurrentImagePath";
 
         [Header("Cell Management")]
         public Color defaultColor = Color.white;
@@ -145,13 +147,20 @@ namespace Superdoku {
          * Launch the camera scene to parse an image and solve it
          */
         public void OnCamera() {
-            if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
-
             // Deselect current active cell
             m_currentActiveCell = null;
 
+            if (EditorUtility.DisplayDialog("Load an Image", "Select method of loading an image.", "Camera", "Gallary"))
+            {
+                if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
+            }
+            else
+            {
+                if (DEBUG_MODE) { Debug.Log("Launching gallary scene..."); }
+            }
+
             // Change to web cam scene
-            SceneManager.LoadScene(WEB_CAM_SCENE);
+            //SceneManager.LoadScene(WEB_CAM_SCENE);
         }
 
         /**
@@ -228,6 +237,22 @@ namespace Superdoku {
                 Debug.LogError(ErrorMessages);
             }
             return retValue;
+        }
+
+        public static Texture2D LoadPNG(string filePath)
+        {
+
+            Texture2D tex = null;
+            byte[] fileData;
+
+            if (File.Exists(filePath))
+            {
+                fileData = File.ReadAllBytes(filePath);
+                tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
+                tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+            }
+
+            return tex;
         }
     }
 }
