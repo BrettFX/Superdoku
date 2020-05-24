@@ -282,7 +282,7 @@ namespace Superdoku
                 display += ((row + 1) % 3 == 0) ? "\n" : "";
             }
 
-            if (GameManager.Instance.DEBUG_MODE) { Debug.Log(display); }
+            if (GameManager.DEBUG_MODE) { Debug.Log(display); }
         }
     }
 }

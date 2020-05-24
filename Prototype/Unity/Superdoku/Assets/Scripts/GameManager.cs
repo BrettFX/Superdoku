@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Superdoku {
@@ -12,8 +14,9 @@ namespace Superdoku {
             }
         }
 
-        [Header("Development")]
-        public bool DEBUG_MODE = false;
+        public const bool DEBUG_MODE = true;
+        public const int HOME_SCENE = 0;
+        public const int WEB_CAM_SCENE = 1;
 
         [Header("Cell Management")]
         public Color defaultColor = Color.white;
@@ -146,6 +149,9 @@ namespace Superdoku {
 
             // Deselect current active cell
             m_currentActiveCell = null;
+
+            // Change to web cam scene
+            SceneManager.LoadScene(WEB_CAM_SCENE);
         }
 
         /**
@@ -187,6 +193,41 @@ namespace Superdoku {
 
             // Commit the button color change
             button.colors = colors;
+        }
+
+        /**
+         * Write a file to the local file system provided with the bytes data of the respecive file
+         
+         * @param string path the base path to where the file is to be written
+         * @param string fileName the name of the file to be written
+         * @param byte[] bytes the array of bytes representing the data of the file
+         * @param FileMode mode the writing strategy to perform on the file
+         * 
+         * @see https://answers.unity.com/questions/1397703/system-io-file-directory-problem.html
+         * @see System.IO.FileMode
+         */
+        public static bool WriteFile(string path, string fileName, byte[] bytes, FileMode mode)
+        {
+            bool retValue = false;
+            string dataPath = path;
+
+            if (!Directory.Exists(dataPath))
+            {
+                Directory.CreateDirectory(dataPath);
+            }
+            dataPath += fileName;
+            try
+            {
+                File.WriteAllBytes(dataPath, bytes);
+                retValue = true;
+            }
+            catch (System.Exception ex)
+            {
+                string ErrorMessages = "File Write Error\n" + ex.Message;
+                retValue = false;
+                Debug.LogError(ErrorMessages);
+            }
+            return retValue;
         }
     }
 }
