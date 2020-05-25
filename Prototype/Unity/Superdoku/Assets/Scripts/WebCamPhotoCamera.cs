@@ -14,8 +14,6 @@ namespace Superdoku
         public string OUTPUT_DIR = GetFolderPath(BASE_OUT_DIR) + "/Superdoku";
         WebCamTexture webCamTexture;
 
-        private bool m_running = false;
-
         void Start()
         {
             webCamTexture = new WebCamTexture();
@@ -24,11 +22,6 @@ namespace Superdoku
 
         private void Update()
         {
-            // Update texture component of RawImage each frame to emulate live action camera feed
-            if (m_running)
-            {
-                
-            }
             GetComponent<RawImage>().texture = webCamTexture;
         }
 

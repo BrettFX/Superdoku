@@ -164,12 +164,12 @@ namespace Superdoku {
             SceneManager.LoadScene(WEB_CAM_SCENE);
         }
 
-        public void OnGallary()
+        public void OnGallery()
         {
             // Deselect current active cell
             m_currentActiveCell = null;
             modalOverlay.SetActive(false);
-            if (DEBUG_MODE) { Debug.Log("Launching gallary scene..."); }
+            if (DEBUG_MODE) { Debug.Log("Launching gallery scene..."); }
 
         }
 

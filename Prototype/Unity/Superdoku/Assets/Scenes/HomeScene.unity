@@ -5563,7 +5563,7 @@ GameObject:
   - component: {fileID: 812480715}
   - component: {fileID: 812480714}
   m_Layer: 5
-  m_Name: BtnGallary
+  m_Name: BtnGallery
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5633,7 +5633,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6573419153193095479}
-        m_MethodName: OnGallary
+        m_MethodName: OnGallery
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
