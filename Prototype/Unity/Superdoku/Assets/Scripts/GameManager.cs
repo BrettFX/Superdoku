@@ -27,6 +27,9 @@ namespace Superdoku {
         public Color invalidCellColor = Color.red;
         public Color invalidTextColor = Color.white;
         public Color invalidSelectionColor = Color.yellow;
+
+        [Header("Miscellaneous")]
+        public GameObject modalOverlay;
         
         private bool m_solved = false;
 
@@ -143,24 +146,36 @@ namespace Superdoku {
             return m_solved;
         }
 
+        public void OnModalOverlay()
+        {
+            modalOverlay.SetActive(true);
+        }
+
         /**
          * Launch the camera scene to parse an image and solve it
          */
         public void OnCamera() {
             // Deselect current active cell
             m_currentActiveCell = null;
-
-            if (EditorUtility.DisplayDialog("Load an Image", "Select method of loading an image.", "Camera", "Gallary"))
-            {
-                if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
-            }
-            else
-            {
-                if (DEBUG_MODE) { Debug.Log("Launching gallary scene..."); }
-            }
+            modalOverlay.SetActive(false);
+            if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
 
             // Change to web cam scene
-            //SceneManager.LoadScene(WEB_CAM_SCENE);
+            SceneManager.LoadScene(WEB_CAM_SCENE);
+        }
+
+        public void OnGallary()
+        {
+            // Deselect current active cell
+            m_currentActiveCell = null;
+            modalOverlay.SetActive(false);
+            if (DEBUG_MODE) { Debug.Log("Launching gallary scene..."); }
+
+        }
+
+        public void OnCancelModalOverlay()
+        {
+            modalOverlay.SetActive(false);
         }
 
         /**
