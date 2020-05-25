@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static System.Environment;
 
@@ -13,6 +14,8 @@ namespace Superdoku
         public string OUTPUT_DIR = GetFolderPath(BASE_OUT_DIR) + "/Superdoku";
         WebCamTexture webCamTexture;
 
+        private bool m_running = false;
+
         void Start()
         {
             webCamTexture = new WebCamTexture();
@@ -22,13 +25,26 @@ namespace Superdoku
         private void Update()
         {
             // Update texture component of RawImage each frame to emulate live action camera feed
-            GetComponent<RawImage>().texture = webCamTexture; 
+            if (m_running)
+            {
+                
+            }
+            GetComponent<RawImage>().texture = webCamTexture;
         }
 
         public void OnSnap()
         {
             // Call coroutine to take a photo
             StartCoroutine("TakePhoto");
+        }
+
+        public void OnBack()
+        {
+            // Important so that the webcam doesn't keep running until Unity is restarted
+            webCamTexture.Stop();
+
+            // Change to home scene
+            SceneManager.LoadScene(GameManager.HOME_SCENE);
         }
 
         /**
