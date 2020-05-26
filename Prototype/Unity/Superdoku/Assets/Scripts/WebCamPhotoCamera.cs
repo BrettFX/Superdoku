@@ -10,10 +10,9 @@ namespace Superdoku
 {
     public class WebCamPhotoCamera : MonoBehaviour
     {
-        public static SpecialFolder BASE_OUT_DIR = SpecialFolder.LocalApplicationData;
-        public string OUTPUT_DIR = GetFolderPath(BASE_OUT_DIR) + "/Superdoku";
+        //public static SpecialFolder BASE_OUT_DIR = SpecialFolder.LocalApplicationData;
+        //public string OUTPUT_DIR = BASE_OUT_DIR + "/Superdoku";
         WebCamTexture webCamTexture;
-        Quaternion baseRotation;
 
         void Start()
         {
@@ -34,7 +33,6 @@ namespace Superdoku
             //webCamTexture = new WebCamTexture(frontCamName);
 
             webCamTexture = new WebCamTexture();
-            baseRotation = transform.rotation;
             webCamTexture.Play();
         }
 
@@ -46,7 +44,7 @@ namespace Superdoku
 
             if (webCamTexture.width < 100)
             {
-                if (GameManager.DEBUG_MODE) { Debug.Log("Still waiting another frame for correct info..."); }
+                if (GameManager.DEBUG_MODE) { Debug.Log("Waiting for correct webcam texture info..."); }
                 return;
             }
 
@@ -117,15 +115,16 @@ namespace Superdoku
             byte[] bytes = photo.EncodeToPNG();
 
             // Write out the PNG.
+            string outputDir = Application.persistentDataPath;
             string outFileName = "/superdoku_snap.png";
-            if (GameManager.WriteFile(OUTPUT_DIR, outFileName, bytes, FileMode.Create))
+            if (GameManager.WriteFile(outputDir, outFileName, bytes, FileMode.Create))
             {
                 // Save output file to player prefs so it can be referenced in image processor scene
-                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, OUTPUT_DIR + outFileName);
+                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, outputDir + outFileName);
 
                 if (GameManager.DEBUG_MODE)
                 {
-                    Debug.Log("Successfully wrote to " + OUTPUT_DIR + outFileName);
+                    Debug.Log("Successfully wrote to " + outputDir + outFileName);
                 }
 
                 // Important so that the webcam doesn't keep running until Unity is restarted

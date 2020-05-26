@@ -318,7 +318,7 @@ namespace Superdoku {
             if (File.Exists(filePath))
             {
                 fileData = File.ReadAllBytes(filePath);
-                tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
+                tex = new Texture2D(0, 0, TextureFormat.BGRA32, false);
                 tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
             }
 
