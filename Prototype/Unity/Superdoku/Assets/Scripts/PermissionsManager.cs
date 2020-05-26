@@ -31,7 +31,6 @@ namespace Superdoku
                 // If the user says yes then present the request again
                 // Display a dialog here.
                 //dialog.AddComponent<PermissionsRationaleDialog>();
-                Application.Quit();
                 return;
             }
             else if (dialog != null)
