@@ -117,17 +117,22 @@ namespace Superdoku
             byte[] bytes = photo.EncodeToPNG();
 
             // Write out the PNG.
-            long time = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
-            string testFile = "/test_" + time + ".png";
-            if (GameManager.WriteFile(OUTPUT_DIR, testFile, bytes, FileMode.Create))
+            string outFileName = "/superdoku_snap.png";
+            if (GameManager.WriteFile(OUTPUT_DIR, outFileName, bytes, FileMode.Create))
             {
                 // Save output file to player prefs so it can be referenced in image processor scene
-                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, OUTPUT_DIR + testFile);
+                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, OUTPUT_DIR + outFileName);
 
                 if (GameManager.DEBUG_MODE)
                 {
-                    Debug.Log("Successfully wrote to " + OUTPUT_DIR + testFile);
+                    Debug.Log("Successfully wrote to " + OUTPUT_DIR + outFileName);
                 }
+
+                // Important so that the webcam doesn't keep running until Unity is restarted
+                webCamTexture.Stop();
+
+                // Navigate to the Image Processor scene
+                SceneManager.LoadScene(GameManager.IMAGE_PROCESSOR_SCENE);
             }
         }
     }
