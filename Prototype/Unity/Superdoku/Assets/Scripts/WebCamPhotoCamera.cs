@@ -10,9 +10,14 @@ namespace Superdoku
 {
     public class WebCamPhotoCamera : MonoBehaviour
     {
+        public GameObject btnBack;
+        public GameObject btnSnap;
+        
         //public static SpecialFolder BASE_OUT_DIR = SpecialFolder.LocalApplicationData;
         //public string OUTPUT_DIR = BASE_OUT_DIR + "/Superdoku";
-        WebCamTexture webCamTexture;
+        private WebCamTexture webCamTexture;
+
+        private bool m_snapped = false;
 
         void Start()
         {
@@ -39,14 +44,21 @@ namespace Superdoku
         
         private void Update()
         {
-            // @see https://answers.unity.com/questions/773464/webcamtexture-correct-resolution-and-ratio.html
-            RawImage rawImage = GetComponent<RawImage>();
+            // Don't proceed if the cam is in an image snapped state
+            if (m_snapped)
+            {
+                return;
+            }
 
+            // Don't proceed if the webcam texture hasn't finished getting metadata
             if (webCamTexture.width < 100)
             {
                 if (GameManager.DEBUG_MODE) { Debug.Log("Waiting for correct webcam texture info..."); }
                 return;
             }
+
+            // @see https://answers.unity.com/questions/773464/webcamtexture-correct-resolution-and-ratio.html
+            RawImage rawImage = GetComponent<RawImage>();
 
             // change as user rotates iPhone or Android:
 
@@ -82,8 +94,31 @@ namespace Superdoku
 
         public void OnSnap()
         {
+            m_snapped = !m_snapped;
+            ToggleAnimation(m_snapped);
+            if (m_snapped && webCamTexture.isPlaying)
+            {
+                webCamTexture.Pause();
+            }  
+            else
+            {
+                if (!webCamTexture.isPlaying)
+                {
+                    webCamTexture.Play();
+                }
+            }
+
             // Call coroutine to take a photo
-            StartCoroutine("TakePhoto");
+            //StartCoroutine("TakePhoto");
+        }
+
+        private void ToggleAnimation(bool b)
+        {
+            Animator btnBackAnimator = btnBack.GetComponent<Animator>();
+            btnBackAnimator.SetBool("snapped", b);
+
+            Animator btnSnapAnimator = btnSnap.GetComponent<Animator>();
+            btnSnapAnimator.SetBool("snapped", b);
         }
 
         public void OnBack()
