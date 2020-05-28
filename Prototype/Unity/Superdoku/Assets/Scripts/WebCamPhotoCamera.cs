@@ -94,20 +94,16 @@ namespace Superdoku
 
         public void OnSnap()
         {
-            m_snapped = !m_snapped;
+            m_snapped = true;
             ToggleAnimation(m_snapped);
-            if (m_snapped && webCamTexture.isPlaying)
+            if (webCamTexture.isPlaying)
             {
                 webCamTexture.Pause();
-            }  
-            else
-            {
-                if (!webCamTexture.isPlaying)
-                {
-                    webCamTexture.Play();
-                }
             }
 
+            // Call coroutine to process image
+            StartCoroutine("ProcessImage");
+            
             // Call coroutine to take a photo
             //StartCoroutine("TakePhoto");
         }
@@ -128,6 +124,28 @@ namespace Superdoku
 
             // Change to home scene
             SceneManager.LoadScene(GameManager.HOME_SCENE);
+        }
+
+        public IEnumerator ProcessImage()
+        {
+            // Keep track of processing time
+            Debug.Log("Began processing image at timestamp: " + Time.time);
+
+            // yield on a new YieldInstruction that waits for n seconds (Debugging).
+            yield return new WaitForSeconds(5);
+
+            // Return back to original state to test animations
+            m_snapped = false;
+            ToggleAnimation(m_snapped);
+
+            // Play the webcam again
+            if (!webCamTexture.isPlaying)
+            {
+                webCamTexture.Play();
+            }
+
+            // After we have waited 5 seconds print the time again.
+            Debug.Log("Finished processing at timestamp: " + Time.time);
         }
 
         /**
