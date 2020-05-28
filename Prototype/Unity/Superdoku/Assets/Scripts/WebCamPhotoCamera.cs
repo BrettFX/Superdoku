@@ -115,10 +115,10 @@ namespace Superdoku
         private void ToggleAnimation(bool b)
         {
             Animator btnBackAnimator = btnBack.GetComponent<Animator>();
-            btnBackAnimator.SetBool("snapped", b);
+            btnBackAnimator.SetTrigger(b ? "ScanStart" : "ScanFinish");
 
             Animator btnSnapAnimator = btnSnap.GetComponent<Animator>();
-            btnSnapAnimator.SetBool("snapped", b);
+            btnSnapAnimator.SetTrigger(b ? "ScanStart" : "ScanFinish");
         }
 
         public void OnBack()
