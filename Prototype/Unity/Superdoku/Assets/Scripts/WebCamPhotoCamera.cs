@@ -1,10 +1,29 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static System.Environment;
+
+// Create task extension to use async Task in Coroutine
+// @see http://www.stevevermeulen.com/index.php/2017/09/using-async-await-in-unity3d-2017/
+public static class TaskExtensions
+{
+    public static IEnumerator AsIEnumerator(this Task task)
+    {
+        while (!task.IsCompleted)
+        {
+            yield return null;
+        }
+
+        if (task.IsFaulted)
+        {
+            throw task.Exception;
+        }
+    }
+}
 
 namespace Superdoku
 {
@@ -102,8 +121,8 @@ namespace Superdoku
             }
 
             // Call coroutine to process image
-            StartCoroutine("ProcessImage");
-            
+            StartCoroutine(ProcessImageCoroutine());
+
             // Call coroutine to take a photo
             //StartCoroutine("TakePhoto");
         }
@@ -126,13 +145,43 @@ namespace Superdoku
             SceneManager.LoadScene(GameManager.HOME_SCENE);
         }
 
-        public IEnumerator ProcessImage()
+        private async Task ProcessImageAsync(Texture texture)
+        {
+            await Task.Delay(5000);
+            //await Task.Run(() =>
+            //{
+            //    //float startTime = Time.deltaTime;
+            //    //float elapsedTime = 0.0f;
+            //    //while (true)
+            //    //{
+            //    //    elapsedTime = Time.deltaTime - startTime;
+            //    //    Debug.Log(elapsedTime);
+            //    //    if (Math.Round(elapsedTime) >= 5)
+            //    //    {
+            //    //        break;
+            //    //    }
+            //    //}
+            //    int count = 0;
+            //    while (count < 1000000)
+            //    {
+            //        count++;
+            //    }
+            //});
+        }
+
+        public IEnumerator ProcessImageCoroutine()
         {
             // Keep track of processing time
             Debug.Log("Began processing image at timestamp: " + Time.time);
 
+            yield return ProcessImageAsync(webCamTexture).AsIEnumerator();
+
+            //yield return new WaitForEndOfImageProcessing(webCamTexture);
+
+            //yield return new WaitForEndOfFrame();
+
             // yield on a new YieldInstruction that waits for n seconds (Debugging).
-            yield return new WaitForSeconds(5);
+            //yield return new WaitForSeconds(5);
 
             // Return back to original state to test animations
             m_snapped = false;
