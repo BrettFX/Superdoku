@@ -147,26 +147,26 @@ namespace Superdoku
 
         private async Task ProcessImageAsync(Texture texture)
         {
-            await Task.Delay(5000);
-            //await Task.Run(() =>
-            //{
-            //    //float startTime = Time.deltaTime;
-            //    //float elapsedTime = 0.0f;
-            //    //while (true)
-            //    //{
-            //    //    elapsedTime = Time.deltaTime - startTime;
-            //    //    Debug.Log(elapsedTime);
-            //    //    if (Math.Round(elapsedTime) >= 5)
-            //    //    {
-            //    //        break;
-            //    //    }
-            //    //}
-            //    int count = 0;
-            //    while (count < 1000000)
-            //    {
-            //        count++;
-            //    }
-            //});
+            //await Task.Delay(5000);
+            await Task.Run(() =>
+            {
+                //float startTime = Time.deltaTime;
+                //float elapsedTime = 0.0f;
+                //while (true)
+                //{
+                //    elapsedTime = Time.deltaTime - startTime;
+                //    Debug.Log(elapsedTime);
+                //    if (Math.Round(elapsedTime) >= 5)
+                //    {
+                //        break;
+                //    }
+                //}
+                int count = 0;
+                while (count < 1000000000)
+                {
+                    count++;
+                }
+            });
         }
 
         public IEnumerator ProcessImageCoroutine()
