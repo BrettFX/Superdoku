@@ -145,30 +145,21 @@ namespace Superdoku
             SceneManager.LoadScene(GameManager.HOME_SCENE);
         }
 
-        private async Task ProcessImageAsync(Texture texture)
+        private async Task ProcessImageAsync(WebCamTexture wct)
         {
             //await Task.Delay(5000);
             await Task.Run(() =>
             {
-                //float startTime = Time.deltaTime;
-                //float elapsedTime = 0.0f;
-                //while (true)
+               
+
+                //int count = 0;
+                //while (count < 1000000000)
                 //{
-                //    elapsedTime = Time.deltaTime - startTime;
-                //    Debug.Log(elapsedTime);
-                //    if (Math.Round(elapsedTime) >= 5)
-                //    {
-                //        break;
-                //    }
+                //    count++;
                 //}
-                int count = 0;
-                while (count < 1000000000)
-                {
-                    count++;
-                }
             });
         }
-
+        
         public IEnumerator ProcessImageCoroutine()
         {
             // Keep track of processing time
@@ -218,11 +209,11 @@ namespace Superdoku
 
             // Write out the PNG.
             string outputDir = Application.persistentDataPath;
-            string outFileName = "/superdoku_snap.png";
+            string outFileName = "superdoku_snap.png";
             if (GameManager.WriteFile(outputDir, outFileName, bytes, FileMode.Create))
             {
                 // Save output file to player prefs so it can be referenced in image processor scene
-                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, outputDir + outFileName);
+                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, outputDir + "/" + outFileName);
 
                 if (GameManager.DEBUG_MODE)
                 {

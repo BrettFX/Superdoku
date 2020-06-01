@@ -287,6 +287,8 @@ namespace Superdoku {
          */
         public static bool WriteFile(string path, string fileName, byte[] bytes, FileMode mode)
         {
+            if (DEBUG_MODE) { Debug.Log("Writing to " + path + "/" + fileName); }
+
             bool retValue = false;
             string dataPath = path;
 
@@ -294,7 +296,7 @@ namespace Superdoku {
             {
                 Directory.CreateDirectory(dataPath);
             }
-            dataPath += fileName;
+            dataPath += "/" + fileName;
             try
             {
                 File.WriteAllBytes(dataPath, bytes);
@@ -323,6 +325,30 @@ namespace Superdoku {
             }
 
             return tex;
+        }
+
+        public static void ConvertToGrayscale(Texture2D texture)
+        {
+            Color32[] pixels = texture.GetPixels32();
+            for (int x = 0; x < texture.width; x++)
+            {
+                for (int y = 0; y < texture.height; y++)
+                {
+                    Color32 pixel = pixels[x + y * texture.width];
+                    int p = ((256 * 256 + pixel.r) * 256 + pixel.b) * 256 + pixel.g;
+                    int b = p % 256;
+                    p = Mathf.FloorToInt(p / 256);
+                    int g = p % 256;
+                    p = Mathf.FloorToInt(p / 256);
+                    int r = p % 256;
+                    float l = (0.2126f * r / 255f) + 0.7152f * (g / 255f) + 0.0722f * (b / 255f);
+                    Color c = new Color(l, l, l, 1);
+                    texture.SetPixel(x, y, c);
+                }
+            }
+            texture.Apply(false);
+            byte[] bytes = texture.EncodeToPNG();
+            WriteFile(Application.persistentDataPath, "GrayScaleTest.png", bytes, FileMode.Create);
         }
 
         /**
