@@ -14,17 +14,17 @@ namespace Superdoku
         void Start()
         {
             // Load image path from player prefs
-            imagePath = PlayerPrefs.GetString(GameManager.IMAGE_PATH_KEY);
-            Texture2D pngImage = GameManager.LoadPNG(imagePath);
-            if (pngImage != null)
-            {
-                GetComponent<RawImage>().texture = pngImage;
-            }
-            else
-            {
-                if (GameManager.DEBUG_MODE) { Debug.LogWarning("Could not load image to process. Navigating back to home"); }
-                SceneManager.LoadScene(GameManager.HOME_SCENE);
-            }
+            //imagePath = PlayerPrefs.GetString(GameManager.IMAGE_PATH_KEY);
+            //Texture2D pngImage = GameManager.LoadPNG(imagePath);
+            //if (pngImage != null)
+            //{
+            //    GetComponent<RawImage>().texture = pngImage;
+            //}
+            //else
+            //{
+            //    if (GameManager.DEBUG_MODE) { Debug.LogWarning("Could not load image to process. Navigating back to home"); }
+            //    SceneManager.LoadScene(GameManager.HOME_SCENE);
+            //}
         }
 
         // Update is called once per frame
