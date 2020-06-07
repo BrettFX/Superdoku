@@ -7,6 +7,7 @@ from keras.preprocessing.image import img_to_array
 from keras.models import load_model
 from PIL import Image
 import os
+from sys import argv as args
 
 def plot_many_images(images, titles, rows=1, columns=2):
     """Plots each image in a given list as a grid structure. using Matplotlib."""
@@ -388,7 +389,11 @@ def parse_grid(path):
 
 
 def main():
-    parse_grid('../../Images/sudoku-original.jpg')
+    if len(args) == 1 or len(args) > 2:
+        print("Invalid CLI args. Pass in an image path for a Sudoku puzzle")
+    else:
+        source_path = args[1]
+        parse_grid(source_path)
 
 if __name__ == '__main__':
     main()
