@@ -69,10 +69,13 @@ public class ObjectResizer : MonoBehaviour
             points = new Vector3[pointCount];
             this.gameObject.AddComponent<LineRenderer>();
             line = this.gameObject.GetComponent<LineRenderer>();
-            line.startWidth = lineWidth; line.endWidth = lineWidth;
+            line.startWidth = lineWidth;
+            line.endWidth = lineWidth;
             line.positionCount = pointCount;
             line.material = new Material(Shader.Find("Sprites/Default"));
-            line.startColor = Color.blue; line.endColor = Color.blue;
+            line.startColor = Color.blue;
+            line.endColor = Color.blue;
+
 
             handler = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             handler.transform.localScale = new Vector3(handlerSize, handlerSize, handlerSize);
