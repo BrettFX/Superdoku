@@ -2,7 +2,11 @@ import cv2
 import operator
 import numpy as np
 from matplotlib import pyplot as plt
-
+from keras.preprocessing.image import load_img
+from keras.preprocessing.image import img_to_array
+from keras.models import load_model
+from PIL import Image
+import os
 
 def plot_many_images(images, titles, rows=1, columns=2):
     """Plots each image in a given list as a grid structure. using Matplotlib."""
@@ -297,6 +301,79 @@ def get_digits(img, squares, size):
     return digits
 
 
+def get_classified_digits(digits, stage_output):
+    """
+    Get region of images (roi) using training CNN for recognizing digits
+    @param nparray digits the array representation of the extracted digits
+    @param boolean stage_output whether to create staging output images for testing
+    """
+    model = load_model('../MNIST_Handwritten_Digit_Classifictation_CNN/final_model.h5')
+    classified_digits = []
+    i = 0
+    for digit in digits:
+        
+        img = Image.fromarray(digit) 
+        if stage_output:
+            # Create staging dir if it does not exist
+
+            if not os.path.exists('staging'):
+                os.makedirs('staging')
+
+            img.save('staging/cell_{}.png'.format(i))
+        
+        # Set classified digit to 0 if the cell is blank
+        if not np.any(digit):
+            classified_digits.append(0)
+        else:
+            # Otherwise, process digit accordingly
+#             img = Image.fromarray(digit)  
+            img_arr = img_to_array(img)
+
+            # reshape into a single sample with 1 channel
+            reshaped = img_arr.reshape(1, 28, 28, 1)
+
+            # prepare pixel data
+            float_data = reshaped.astype('float32')
+            final_img = float_data / 255.0
+
+            # predict the class
+            digit = model.predict_classes(final_img)
+            classified_digits.append(digit[0])
+        
+        i += 1
+        
+    return classified_digits
+
+
+def get_grid_array(digits, stage_output=False):
+    classified_digits = get_classified_digits(digits, stage_output=stage_output)
+    row = []
+    grid = []
+    for i in range(len(classified_digits)):
+        if i != 0 and (i % (len(classified_digits) / 9)) == 0:
+            grid.append(row)
+            row = []
+
+        row.append(classified_digits[i])
+    grid.append(row)
+    return grid
+
+
+def print_sudoku_puzzle(grid_array):
+    # The character to determine formatting
+    display = "";
+
+    # Use the values from the sudokuPuzzle and write them to the respective cell using the txtFieldMap
+    for row in range(9):
+        display += "\n"
+        for col in range(9):
+            # Print out a divider every third line
+            display += ("\t" if (col % 3 == 0) else " ") + str(grid_array[row][col]);
+        display += "\n" if ((row + 1) % 3 == 0) else ""
+            
+    print(display)
+
+
 def parse_grid(path):
     original = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     processed = pre_process_image(original)
@@ -304,7 +381,10 @@ def parse_grid(path):
     cropped = crop_and_warp(original, corners)
     squares = infer_grid(cropped)
     digits = get_digits(cropped, squares, 28)
+    grid_array = get_grid_array(digits, stage_output=False)
+
     show_digits(digits)
+    print_sudoku_puzzle(grid_array)
 
 
 def main():
