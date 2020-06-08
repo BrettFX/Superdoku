@@ -19,9 +19,9 @@ def plot_many_images(images, titles, rows=1, columns=2):
     plt.show()
 
 
-def show_image(img):
+def show_image(img, title='image'):
     """Shows an image until any key is pressed"""
-    cv2.imshow('image', img)  # Display the image
+    cv2.imshow(title, img)  # Display the image
     cv2.waitKey(0)  # Wait for any key to be pressed (with the image window active)
     cv2.destroyAllWindows()  # Close all windows
 
@@ -308,7 +308,7 @@ def get_classified_digits(digits, stage_output):
     @param nparray digits the array representation of the extracted digits
     @param boolean stage_output whether to create staging output images for testing
     """
-    model = load_model('../MNIST_Handwritten_Digit_Classifictation_CNN/final_model.h5')
+    model = load_model('digit_classifier_cnn.h5')
     classified_digits = []
     i = 0
     for digit in digits:
@@ -375,17 +375,39 @@ def print_sudoku_puzzle(grid_array):
     print(display)
 
 
-def parse_grid(path):
-    original = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    processed = pre_process_image(original)
-    corners = find_corners_of_largest_polygon(processed)
-    cropped = crop_and_warp(original, corners)
-    squares = infer_grid(cropped)
-    digits = get_digits(cropped, squares, 28)
-    grid_array = get_grid_array(digits, stage_output=False)
+def get_resized_img(img, threshold_dim=(500, 500)):
+    """
+    Resize an image to be within the specified threshold. This function
+    is used primarily to ensure the size of an image is large enough to 
+    be processed
+    """
+    width, height, channels = img.shape
+    r = 500.0 / img.shape[1]
+    dim = (500, int(img.shape[0] * r))
+    # If the image width and height do not exceed the specified threshold dimensions then resize accordingly
+    if width < threshold_dim[0] and height < threshold_dim[1]:
+        return cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    # Otherwise, return the original image
+    return img
 
-    show_digits(digits)
-    print_sudoku_puzzle(grid_array)
+
+def parse_grid(path):
+    original = cv2.imread(path, cv2.IMREAD_COLOR)           # Read in the input file with color
+    # show_image(original, title='Original')
+    resized = get_resized_img(original)                     # Resize the image as needed (must be at least 500x500 and colored)
+    # show_image(resized, title='Resized')
+    grayscale = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)   # Convert the image to grayscale for preprocessing
+    # show_image(grayscale, title='Grayscale')
+    processed = pre_process_image(grayscale)                # Preprocess the image to prepare for identifying corners
+    corners = find_corners_of_largest_polygon(processed)    # Find the corners of the Sudoku puzzle
+    cropped = crop_and_warp(grayscale, corners)             # Crop the image to only encompass the Sudoku portion
+    # show_image(cropped, title='Cropped')
+    squares = infer_grid(cropped)                           # Draw squares for each Suduko grid cell
+    digits = get_digits(cropped, squares, 28)               # Grab all the digits from the cells (e.g., roi)
+    grid_array = get_grid_array(digits, stage_output=False) # Get the grid array based on the extracted digits
+
+    show_digits(digits)                                     # Show the extracted digits
+    print_sudoku_puzzle(grid_array)                         # Print the parsed Sudoku puzzle (unsolved)
 
 
 def main():
