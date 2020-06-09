@@ -9,6 +9,11 @@ from PIL import Image
 import os
 from sys import argv as args
 
+# Global constants
+# keras_digit_classifier_model.h5
+# digit_classifier_cnn.h5
+DIGIT_CLASSIFIER_MODEL_PATH = 'digit_classifier_cnn.h5'
+
 def plot_many_images(images, titles, rows=1, columns=2):
     """Plots each image in a given list as a grid structure. using Matplotlib."""
     for i, image in enumerate(images):
@@ -302,13 +307,36 @@ def get_digits(img, squares, size):
     return digits
 
 
+def classify_digit(digit_img, model):
+    """
+    Use ML model to classify an image of a digit to the respective integer 
+    representation in memory
+    @param digit_img the digit image in question, assumed to be in an inverted black and white format
+    @param model the machine learning model to use for prediction
+    @return the integer representation of the digit image in question
+    """
+    
+    img_arr = img_to_array(digit_img)
+
+    # reshape into a single sample with 1 channel
+    reshaped = img_arr.reshape(1, 28, 28, 1)
+
+    # prepare pixel data
+    float_data = reshaped.astype('float32')
+    final_img = float_data / 255.0
+
+    # predict the class
+    digit = model.predict_classes(final_img)
+    return digit[0]
+
+
 def get_classified_digits(digits, stage_output):
     """
     Get region of images (roi) using training CNN for recognizing digits
     @param nparray digits the array representation of the extracted digits
     @param boolean stage_output whether to create staging output images for testing
     """
-    model = load_model('digit_classifier_cnn.h5')
+    model = load_model(DIGIT_CLASSIFIER_MODEL_PATH)
     classified_digits = []
     i = 0
     for digit in digits:
@@ -326,28 +354,15 @@ def get_classified_digits(digits, stage_output):
         if not np.any(digit):
             classified_digits.append(0)
         else:
-            # Otherwise, process digit accordingly
-#             img = Image.fromarray(digit)  
-            img_arr = img_to_array(img)
-
-            # reshape into a single sample with 1 channel
-            reshaped = img_arr.reshape(1, 28, 28, 1)
-
-            # prepare pixel data
-            float_data = reshaped.astype('float32')
-            final_img = float_data / 255.0
-
-            # predict the class
-            digit = model.predict_classes(final_img)
-            classified_digits.append(digit[0])
+            classified_digit = classify_digit(img, model)
+            classified_digits.append(classified_digit)
         
         i += 1
         
     return classified_digits
 
 
-def get_grid_array(digits, stage_output=False):
-    classified_digits = get_classified_digits(digits, stage_output=stage_output)
+def get_grid_array(classified_digits):
     row = []
     grid = []
     for i in range(len(classified_digits)):
@@ -360,7 +375,9 @@ def get_grid_array(digits, stage_output=False):
     return grid
 
 
-def print_sudoku_puzzle(grid_array):
+def print_sudoku_puzzle(classified_digits):
+    grid_array = get_grid_array(classified_digits)          # Get the grid array based on the extracted digits
+
     # The character to determine formatting
     display = "";
 
@@ -372,29 +389,52 @@ def print_sudoku_puzzle(grid_array):
             display += ("\t" if (col % 3 == 0) else " ") + str(grid_array[row][col]);
         display += "\n" if ((row + 1) % 3 == 0) else ""
             
+    print("\nSudoku Puzzle:")
     print(display)
 
 
-def get_resized_img(img, threshold_dim=(500, 500)):
+def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
     """
     Resize an image to be within the specified threshold. This function
     is used primarily to ensure the size of an image is large enough to 
     be processed
     """
-    width, height, channels = img.shape
-    r = 500.0 / img.shape[1]
-    dim = (500, int(img.shape[0] * r))
-    # If the image width and height do not exceed the specified threshold dimensions then resize accordingly
-    if width < threshold_dim[0] and height < threshold_dim[1]:
-        return cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-    # Otherwise, return the original image
-    return img
+
+    # initialize the dimensions of the image to be resized and
+    # grab the image size
+    dim = None
+    (h, w) = image.shape[:2]
+
+    # if both the width and height are None, then return the
+    # original image
+    if width is None and height is None:
+        return image
+
+    # check to see if the width is None
+    if width is None:
+        # calculate the ratio of the height and construct the
+        # dimensions
+        r = height / float(h)
+        dim = (int(w * r), height)
+
+    # otherwise, the height is None
+    else:
+        # calculate the ratio of the width and construct the
+        # dimensions
+        r = width / float(w)
+        dim = (width, int(h * r))
+
+    # resize the image
+    resized = cv2.resize(image, dim, interpolation = inter)
+
+    # return the resized image
+    return resized
 
 
 def parse_grid(path):
     original = cv2.imread(path, cv2.IMREAD_COLOR)           # Read in the input file with color
     # show_image(original, title='Original')
-    resized = get_resized_img(original)                     # Resize the image as needed (must be at least 500x500 and colored)
+    resized = image_resize(original, height=600)            # Resize the image as needed (e.g., 600x600)
     # show_image(resized, title='Resized')
     grayscale = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)   # Convert the image to grayscale for preprocessing
     # show_image(grayscale, title='Grayscale')
@@ -404,10 +444,12 @@ def parse_grid(path):
     # show_image(cropped, title='Cropped')
     squares = infer_grid(cropped)                           # Draw squares for each Suduko grid cell
     digits = get_digits(cropped, squares, 28)               # Grab all the digits from the cells (e.g., roi)
-    grid_array = get_grid_array(digits, stage_output=False) # Get the grid array based on the extracted digits
-
     show_digits(digits)                                     # Show the extracted digits
-    print_sudoku_puzzle(grid_array)                         # Print the parsed Sudoku puzzle (unsolved)
+    
+    # Get the classified digits (array of digits to be returned as a response)
+    classified_digits = get_classified_digits(digits, stage_output=False)
+    print("Response Object: {}".format(classified_digits))
+    print_sudoku_puzzle(classified_digits)                         # Print the parsed Sudoku puzzle (unsolved)
 
 
 def main():
