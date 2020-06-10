@@ -5,6 +5,12 @@ from keras.preprocessing.image import img_to_array
 from keras.models import load_model
 from sys import argv as args
 
+# Global constants
+# keras_digit_classifier_model.h5
+# digit_classifier_cnn.h5
+# digit_classifier_cnn_model_with_droupout.h5
+DIGIT_CLASSIFIER_MODEL_PATH = 'digit_classifier_cnn_model_with_droupout.h5'
+
 # load and prepare the image
 def load_image(filename):
     # load the image
@@ -23,7 +29,7 @@ def run_example(source_path):
     # load the image
     img = load_image(source_path)
     # load model
-    model = load_model('final_model.h5')
+    model = load_model(DIGIT_CLASSIFIER_MODEL_PATH)
     # predict the class
     digit = model.predict_classes(img)
     print(digit[0])

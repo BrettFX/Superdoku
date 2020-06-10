@@ -12,6 +12,7 @@ from sys import argv as args
 # Global constants
 # keras_digit_classifier_model.h5
 # digit_classifier_cnn.h5
+# digit_classifier_cnn_model_with_droupout.h5
 DIGIT_CLASSIFIER_MODEL_PATH = 'digit_classifier_cnn.h5'
 
 def plot_many_images(images, titles, rows=1, columns=2):
@@ -355,6 +356,11 @@ def get_classified_digits(digits, stage_output):
             classified_digits.append(0)
         else:
             classified_digit = classify_digit(img, model)
+
+            # Handle corner cases
+            if classified_digit == 0:
+                classified_digit = 4    # Common for 4 to be misclassified as 0
+
             classified_digits.append(classified_digit)
         
         i += 1
