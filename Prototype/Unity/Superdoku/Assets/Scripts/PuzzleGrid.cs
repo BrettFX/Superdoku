@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using static Utils;
 
 namespace Superdoku
 {
@@ -42,8 +43,27 @@ namespace Superdoku
         void Start()
         {
             // Initialize the sudoku puzzle
-            sudokuPuzzle = new int[9,9];
-            GameManager.Instance.InitializePuzzle();
+            // Attempt to load from prefs
+            string puzzleStr = PlayerPrefs.GetString("ScannedPuzzle");
+            
+            if (puzzleStr != null)
+            {
+                // Delete the key so that a previously scanned puzzle isn't loaded all the time
+                PlayerPrefs.DeleteKey("ScannedPuzzle");
+
+                // Parse response to integer array
+                SudokuPuzzle loadedPuzzle = JsonUtility.FromJson<SudokuPuzzle>(puzzleStr);
+                sudokuPuzzle = BuildSudokuGrid(loadedPuzzle.puzzle);
+                
+                // Invoke show method to render to puzzle UI
+                Show();
+            }
+            else
+            {
+                sudokuPuzzle = new int[9, 9];
+                GameManager.Instance.InitializePuzzle();
+            }
+                        
         }
 
         // Update is called once per frame
@@ -86,7 +106,7 @@ namespace Superdoku
                     }
                 }
             }
-        }        
+        } 
 
         /**
 	    * Determines if the number to be inserted has not already been used in the current row
