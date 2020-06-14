@@ -1,15 +1,20 @@
-﻿using System.IO;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 namespace Superdoku
 {
     public class RestRequest : MonoBehaviour
     {
+        public Texture2D testImage;
         private const string BASE_URL = "http://localhost:5000/superdoku-api/{0}";
 
-        public string SendRequest(string url, string method, Object data)
+        public string SendRequest(string url, string method, byte[] data)
         {
             Debug.Log("URL: " + url);
             Debug.Log("Method: " + method);
@@ -26,9 +31,10 @@ namespace Superdoku
                     StreamReader reader = new StreamReader(response.GetResponseStream());
                     responseStr = reader.ReadToEnd();
                     break;
-                case "POST":
-                    // TODO Use UnityWebRequest to send post request with data in request body
-                    // See: https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest.Post.html
+                case "PUT":
+                    // Use UnityWebRequest to send post request with data in request body
+                    // See: https://docs.unity3d.com/Manual/UnityWebRequest-UploadingRawData.html
+                    StartCoroutine(Upload(url, data));
                     break;
             }
 
@@ -55,10 +61,39 @@ namespace Superdoku
             SceneManager.LoadScene(GameManager.HOME_SCENE);
         }
 
-        public void RecognizeTest(Texture2D image)
+        public void RecognizeTest()
         {
-            string response = SendRequest(string.Format(BASE_URL, "recognize"), "POST", image);
-            Debug.Log("Recognize Test Response: " + response);
+            SendRequest(string.Format(BASE_URL, "recognize"), "PUT", testImage.EncodeToPNG());
+        }
+
+        IEnumerator Upload(string url, byte[] data)
+        {
+            
+            UnityWebRequest request = UnityWebRequest.Put(url, data);
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!");
+
+                // Get Response information
+                StringBuilder sb = new StringBuilder();
+                foreach (KeyValuePair<string, string> dict in request.GetResponseHeaders())
+                {
+                    sb.Append(dict.Key).Append(": \t[").Append(dict.Value).Append("]\n");
+                }
+
+                // Print Headers
+                Debug.Log(sb.ToString());
+
+                // Print Body
+                Debug.Log(request.downloadHandler.text);
+            }
         }
     }
 }

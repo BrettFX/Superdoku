@@ -6,8 +6,8 @@ Author: Brett Allen
 """
 import flask
 from flask import request, jsonify
-import SudokuExtractor
 import datetime
+# import SudokuExtractor
 
 API_BASE_URL = "/superdoku-api"
 
@@ -44,7 +44,7 @@ def test():
     return jsonify(test_sudoku)
 
 # Process an image of a Sudoku puzzle and return the parsed results
-@app.route('{}/recognize'.format(API_BASE_URL), methods=['POST'])
+@app.route('{}/recognize'.format(API_BASE_URL), methods=['PUT'])
 def recognize():
     """
     Invoke the image recognition task of the SudokuExtractor library.
@@ -55,6 +55,9 @@ def recognize():
         The json response representing the array of integers for the classified digits.
         of the Sudoku puzzle image.
     """
+    # Build response string to handle any errors that may occur
+    response = ""
+
     # Get current date time for file timestamp
     now = datetime.datetime.now()
     file_timestamp = "{}{}{}_{}{}_{}_{}".format(
@@ -64,14 +67,28 @@ def recognize():
     # Create file path with file timestamp appended
     file_path = '/tmp/superdoku-snap_{}.png'.format(file_timestamp)
 
-    # Ensure octet stream is being used
-    if request.headers['Content-Type'] == 'application/octet-stream':
-        with open(file_path, 'wb') as f:
-            f.write(request.data)
-            f.close()
-        return "Binary message written!"
+    # Ensure multipart form-data is being used
+    if 'application/octet-stream' in request.headers['Content-Type']:
+        if len(request.data) > 0:
+            with open(file_path, 'wb') as f:
+                f.write(request.data)
+                f.close()
+        
+            response = "Superdoku snap image saved to {}".format(file_path)
+            response = response + "\n|-- data length: {}".format(len(request.data))
+        else:
+            response = "Could not get request data to write file with."
+    else:
+       response = "Could not save image to server. Request header was {}".format(request.headers['Content-Type']) 
+
     
-    # Pass the image to the SudokuExtractor 
+    # TODO Pass the image to the SudokuExtractor and get the resulting array
+
+
+    # TODO cleanup and remove temporary sudoku snaped image from the server
+
+
+    return response
 
 @app.errorhandler(404)
 def page_not_found(e):
