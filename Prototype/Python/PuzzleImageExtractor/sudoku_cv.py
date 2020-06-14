@@ -450,7 +450,7 @@ def parse_grid(path):
     # show_image(cropped, title='Cropped')
     squares = infer_grid(cropped)                           # Draw squares for each Suduko grid cell
     digits = get_digits(cropped, squares, 28)               # Grab all the digits from the cells (e.g., roi)
-    show_digits(digits)                                     # Show the extracted digits
+    # show_digits(digits)                                     # Show the extracted digits
     
     # Get the classified digits (array of digits to be returned as a response)
     classified_digits = get_classified_digits(digits, stage_output=False)
