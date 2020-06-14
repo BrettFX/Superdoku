@@ -1,5 +1,6 @@
 import flask
 from flask import request, jsonify
+import SudokuExtractor
 
 API_BASE_URL = "/superdoku-api"
 
@@ -32,6 +33,18 @@ def ping():
 @app.route('{}/test'.format(API_BASE_URL), methods=['GET'])
 def test():
     return jsonify(test_sudoku)
+
+# Process an image of a Sudoku puzzle and return the parsed results
+@app.route('{}/recognize'.format(API_BASE_URL), methods=['POST'])
+def recognize():
+    # Ensure octet stream is being used
+    if request.headers['Content-Type'] == 'application/octet-stream':
+        with open('/tmp/superdoku-snap.png', 'wb') as f:
+            f.write(request.data)
+            f.close()
+        return "Binary message written!"
+    
+    # Pass the image to the SudokuExtractor 
 
 @app.errorhandler(404)
 def page_not_found(e):
