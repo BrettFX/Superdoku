@@ -253,7 +253,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 43e4babf82a46344d9c90f86461de3c4, type: 3}
+  m_Texture: {fileID: 2800000, guid: 376f6e1aab237924caeee8880d022b36, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -765,7 +765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c5621137a1014045967ded48ad4e377, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testImage: {fileID: 2800000, guid: 43e4babf82a46344d9c90f86461de3c4, type: 3}
+  testImage: {fileID: 368891630}
 --- !u!4 &1322525513
 Transform:
   m_ObjectHideFlags: 0
