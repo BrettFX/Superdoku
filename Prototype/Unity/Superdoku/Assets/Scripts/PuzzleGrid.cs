@@ -45,7 +45,10 @@ namespace Superdoku
             // Initialize the sudoku puzzle
             // Attempt to load from prefs
             string puzzleStr = PlayerPrefs.GetString("ScannedPuzzle");
-            
+            sudokuPuzzle = new int[9, 9];
+            GameManager.Instance.InitializePuzzle();
+
+            // Load the scanned puzzle if one exists
             if (puzzleStr != null)
             {
                 // Delete the key so that a previously scanned puzzle isn't loaded all the time
@@ -57,13 +60,7 @@ namespace Superdoku
                 
                 // Invoke show method to render to puzzle UI
                 Show();
-            }
-            else
-            {
-                sudokuPuzzle = new int[9, 9];
-                GameManager.Instance.InitializePuzzle();
-            }
-                        
+            }                        
         }
 
         // Update is called once per frame

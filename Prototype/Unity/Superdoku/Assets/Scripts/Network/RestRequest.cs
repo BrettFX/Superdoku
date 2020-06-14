@@ -6,12 +6,13 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Superdoku
 {
     public class RestRequest : MonoBehaviour
     {
-        public Texture2D testImage;
+        public GameObject testImage;
         private const string BASE_URL = "http://localhost:5000/superdoku-api/{0}";
 
         public string SendRequest(string url, string method, byte[] data)
@@ -63,7 +64,9 @@ namespace Superdoku
 
         public void RecognizeTest()
         {
-            SendRequest(string.Format(BASE_URL, "recognize"), "PUT", testImage.EncodeToPNG());
+            RawImage raw = testImage.GetComponent<RawImage>();
+            Texture2D img = (Texture2D)raw.texture;
+            SendRequest(string.Format(BASE_URL, "recognize"), "PUT", img.EncodeToPNG());
         }
 
         IEnumerator Upload(string url, byte[] data)
@@ -93,6 +96,10 @@ namespace Superdoku
 
                 // Print Body
                 Debug.Log(request.downloadHandler.text);
+
+                // Set puzzle grid and navigate to home screen
+                PlayerPrefs.SetString("ScannedPuzzle", request.downloadHandler.text);
+                SceneManager.LoadScene(GameManager.HOME_SCENE);
             }
         }
     }

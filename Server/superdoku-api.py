@@ -55,8 +55,8 @@ def recognize():
         The json response representing the array of integers for the classified digits.
         of the Sudoku puzzle image.
     """
-    # Build response string to handle any errors that may occur
-    response = ""
+    # Build response object to contain all necessary information (including metadata)
+    response = {}
 
     # Get current date time for file timestamp
     now = datetime.datetime.now()
@@ -74,20 +74,19 @@ def recognize():
                 f.write(request.data)
                 f.close()
         
-            response = "Superdoku snap image saved to {}".format(file_path)
-            response = response + "\n|-- data length: {}".format(len(request.data))
+            response["receipt"] = "Superdoku snap image saved to {}".format(file_path)
+            response["receipt"] = response["receipt"] + "\n|-- data length: {}".format(len(request.data))
+
+            # TODO Pass the image to the SudokuExtractor and get the resulting array
+            # classified_digits = SudokuExtractor.parse_grid(file_path)
+
+            # TODO cleanup and remove temporary sudoku snaped image from the server
+
         else:
-            response = "Could not get request data to write file with."
+            response["error"] = "Could not get request data to write file with."
     else:
-       response = "Could not save image to server. Request header was {}".format(request.headers['Content-Type']) 
-
+       response["error"] = "Could not save image to server. Request header was {}".format(request.headers['Content-Type']) 
     
-    # TODO Pass the image to the SudokuExtractor and get the resulting array
-
-
-    # TODO cleanup and remove temporary sudoku snaped image from the server
-
-
     return response
 
 @app.errorhandler(404)
