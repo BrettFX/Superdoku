@@ -1,3 +1,16 @@
+"""
+A Sudoko image extraction script using Keras and OpenCV modules.
+
+Filename: SudokuExtractor.py
+Author: Brett Allen
+Description: 
+    Take an image of a Sudoku puzzle, use the OpenCV module to normalize and pre-process
+    the image. Once pre-processing is complete, the script uses a pre-training digit
+    classification cnn to iteratively classify the set of image regions representing the
+    individual sudoku puzzle digits. Lastly, an integer array of the classified digits
+    is created and returned as an interfacing component for external programs such as a 
+    REST API.
+"""
 import cv2
 import operator
 import numpy as np
@@ -16,7 +29,7 @@ from sys import argv as args
 DIGIT_CLASSIFIER_MODEL_PATH = 'digit_classifier_cnn.h5'
 
 def plot_many_images(images, titles, rows=1, columns=2):
-    """Plots each image in a given list as a grid structure. using Matplotlib."""
+    """Plot each image in a given list as a grid structure. using Matplotlib."""
     for i, image in enumerate(images):
         plt.subplot(rows, columns, i+1)
         plt.imshow(image, 'gray')
@@ -26,14 +39,14 @@ def plot_many_images(images, titles, rows=1, columns=2):
 
 
 def show_image(img, title='image'):
-    """Shows an image until any key is pressed"""
+    """Show an image until any key is pressed."""
     cv2.imshow(title, img)  # Display the image
     cv2.waitKey(0)  # Wait for any key to be pressed (with the image window active)
     cv2.destroyAllWindows()  # Close all windows
 
 
 def show_digits(digits, colour=255):
-    """Shows list of 81 extracted digits in a grid format"""
+    """Show list of 81 extracted digits in a grid format."""
     rows = []
     with_border = [cv2.copyMakeBorder(img.copy(), 1, 1, 1, 1, cv2.BORDER_CONSTANT, None, colour) for img in digits]
     for i in range(9):
@@ -70,7 +83,7 @@ def display_points(in_img, points, radius=5, colour=(0, 0, 255)):
 
 
 def display_rects(in_img, rects, colour=(0, 0, 255)):
-    """Displays rectangles on the image."""
+    """Display rectangles on the image."""
     img = convert_when_colour(colour, in_img.copy())
     for rect in rects:
         img = cv2.rectangle(img, tuple(int(x) for x in rect[0]), tuple(int(x) for x in rect[1]), colour)
@@ -79,15 +92,14 @@ def display_rects(in_img, rects, colour=(0, 0, 255)):
 
 
 def display_contours(in_img, contours, colour=(0, 0, 255), thickness=2):
-    """Displays contours on the image."""
+    """Display contours on the image."""
     img = convert_when_colour(colour, in_img.copy())
     img = cv2.drawContours(img, contours, -1, colour, thickness)
     show_image(img)
 
 
 def pre_process_image(img, skip_dilate=False):
-    """Uses a blurring function, adaptive thresholding and dilation to expose the main features of an image."""
-
+    """Use a blurring function, adaptive thresholding and dilation to expose the main features of an image."""
     # Gaussian blur with a kernal size (height, width) of 9.
     # Note that kernal sizes must be positive and odd and the kernel must be square.
     proc = cv2.GaussianBlur(img.copy(), (9, 9), 0)
@@ -108,7 +120,7 @@ def pre_process_image(img, skip_dilate=False):
 
 
 def find_corners_of_largest_polygon(img):
-    """Finds the 4 extreme corners of the largest contour in the image."""
+    """Find the 4 extreme corners of the largest contour in the image."""
     contours, h = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)  # Find contours
     contours = sorted(contours, key=cv2.contourArea, reverse=True)  # Sort by area, descending
     polygon = contours[0]  # Largest image
@@ -131,15 +143,14 @@ def find_corners_of_largest_polygon(img):
 
 
 def distance_between(p1, p2):
-    """Returns the scalar distance between two points"""
+    """Return the scalar distance between two points."""
     a = p2[0] - p1[0]
     b = p2[1] - p1[1]
     return np.sqrt((a ** 2) + (b ** 2))
 
 
 def crop_and_warp(img, crop_rect):
-    """Crops and warps a rectangular section from an image into a square of similar size."""
-
+    """Crop and warps a rectangular section from an image into a square of similar size."""
     # Rectangle described by top left, top right, bottom right and bottom left points
     top_left, top_right, bottom_right, bottom_left = crop_rect[0], crop_rect[1], crop_rect[2], crop_rect[3]
 
@@ -165,7 +176,7 @@ def crop_and_warp(img, crop_rect):
 
 
 def infer_grid(img):
-    """Infers 81 cell grid from a square image."""
+    """Infer 81 cell grid from a square image."""
     squares = []
     side = img.shape[:1]
     side = side[0] / 9
@@ -180,27 +191,29 @@ def infer_grid(img):
 
 
 def cut_from_rect(img, rect):
-    """Cuts a rectangle from an image using the top left and bottom right points."""
+    """Cut a rectangle from an image using the top left and bottom right points."""
     return img[int(rect[0][1]):int(rect[1][1]), int(rect[0][0]):int(rect[1][0])]
 
 
+def centre_pad(length):
+    """Handle centering for a given length that may be odd or even."""
+    if length % 2 == 0:
+        side1 = int((size - length) / 2)
+        side2 = side1
+    else:
+        side1 = int((size - length) / 2)
+        side2 = side1 + 1
+    return side1, side2
+
+
+def scale(r, x):
+    """Scale by truncating the product of r and x."""
+    return int(r * x)
+
+
 def scale_and_centre(img, size, margin=0, background=0):
-    """Scales and centres an image onto a new background square."""
+    """Scale and centres an image onto a new background square."""
     h, w = img.shape[:2]
-
-    def centre_pad(length):
-        """Handles centering for a given length that may be odd or even."""
-        if length % 2 == 0:
-            side1 = int((size - length) / 2)
-            side2 = side1
-        else:
-            side1 = int((size - length) / 2)
-            side2 = side1 + 1
-        return side1, side2
-
-    def scale(r, x):
-        return int(r * x)
-
     if h > w:
         t_pad = int(margin / 2)
         b_pad = t_pad
@@ -221,8 +234,18 @@ def scale_and_centre(img, size, margin=0, background=0):
 
 def find_largest_feature(inp_img, scan_tl=None, scan_br=None):
     """
-    Uses the fact the `floodFill` function returns a bounding box of the area it filled to find the biggest
-    connected pixel structure in the image. Fills this structure in white, reducing the rest to black.
+    Fill this structure in white, reducing the rest to black.
+
+    Use the fact the `floodFill` function returns a bounding box of the area it filled to find the biggest
+    connected pixel structure in the image.
+
+    Parameters:
+        inp_img (cv2.image): the region of image (roi) representing a digit
+        scan_tl ([nparray]): margin top, margin left
+        scan_br ([nparray]): margin bottom, margin right
+
+    Returns:
+        img, np.array(bbox, dtype='float32'), seed_point
     """
     img = inp_img.copy()  # Copy the image, leaving the original untouched
     height, width = img.shape[:2]
@@ -277,8 +300,7 @@ def find_largest_feature(inp_img, scan_tl=None, scan_br=None):
 
 
 def extract_digit(img, rect, size):
-    """Extracts a digit (if one exists) from a Sudoku square."""
-
+    """Extract a digit (if one exists) from a Sudoku square."""
     digit = cut_from_rect(img, rect)  # Get the digit box from the whole square
 
     # Use fill feature finding to get the largest feature in middle of the box
@@ -300,7 +322,7 @@ def extract_digit(img, rect, size):
 
 
 def get_digits(img, squares, size):
-    """Extracts digits from their cells and builds an array"""
+    """Extract digits from their cells and builds an array."""
     digits = []
     img = pre_process_image(img.copy(), skip_dilate=True)
     for square in squares:
@@ -310,13 +332,15 @@ def get_digits(img, squares, size):
 
 def classify_digit(digit_img, model):
     """
-    Use ML model to classify an image of a digit to the respective integer 
-    representation in memory
-    @param digit_img the digit image in question, assumed to be in an inverted black and white format
-    @param model the machine learning model to use for prediction
-    @return the integer representation of the digit image in question
-    """
+    Use ML model to classify an image of a digit to the respective integer representation in memory.
+
+    Parameters:
+        digit_img (PIL.Image): the digit image in question, assumed to be in an inverted black and white format.
+        model (keras.models.load_model) the machine learning model to use for prediction.
     
+    Returns:
+        the integer representation of the digit image in question.
+    """
     img_arr = img_to_array(digit_img)
 
     # reshape into a single sample with 1 channel
@@ -333,9 +357,14 @@ def classify_digit(digit_img, model):
 
 def get_classified_digits(digits, stage_output):
     """
-    Get region of images (roi) using training CNN for recognizing digits
-    @param nparray digits the array representation of the extracted digits
-    @param boolean stage_output whether to create staging output images for testing
+    Get region of images (roi) using training CNN for recognizing digits.
+
+    Parameters:
+        digits (nparray): the array representation of the extracted digits.
+        stage_output (bool): whether to create staging output images for testing.
+
+    Returns:
+        the integer array list of classified digits.
     """
     model = load_model(DIGIT_CLASSIFIER_MODEL_PATH)
     classified_digits = []
@@ -369,6 +398,15 @@ def get_classified_digits(digits, stage_output):
 
 
 def get_grid_array(classified_digits):
+    """
+    Get 2-Dimensional representation of the 1-Dimensional integer array of classified digits.
+
+    Parameters:
+        classified_digits ([int]): the array of integers representing the classified digits.
+
+    Returns:
+        the 2-Dimensional grid.
+    """
     row = []
     grid = []
     for i in range(len(classified_digits)):
@@ -382,7 +420,14 @@ def get_grid_array(classified_digits):
 
 
 def print_sudoku_puzzle(classified_digits):
-    grid_array = get_grid_array(classified_digits)          # Get the grid array based on the extracted digits
+    """
+    Display Sudoku puzzle to the console.
+
+    Parameters:
+        classified_digits ([int]): the array of integers representing the classified digits.
+    """    
+    # Get the grid array based on the extracted digits
+    grid_array = get_grid_array(classified_digits)
 
     # The character to determine formatting
     display = "";
@@ -401,11 +446,21 @@ def print_sudoku_puzzle(classified_digits):
 
 def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
     """
-    Resize an image to be within the specified threshold. This function
-    is used primarily to ensure the size of an image is large enough to 
-    be processed
-    """
+    Resize an image to be within the specified threshold width and height.
+    
+    This function is used primarily to ensure the size of an image is large enough to 
+    be processed.
 
+    Parameters:
+        image (cv2.imread): The cv2 image to resize
+        width (int): The desired width of the resized image
+        height (int): The desired height of the resized image
+        inter (int): Global constant integer representing the interpolation method for cv2. 
+                     Defaults to cv2.INTER_AREA
+
+    Returns:
+        the resized cv2 image
+    """
     # initialize the dimensions of the image to be resized and
     # grab the image size
     dim = None
@@ -438,6 +493,15 @@ def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
 
 
 def parse_grid(path):
+    """
+    Parse an image of a Sudoku puzzle given a path to the respective image.
+
+    Parameters:
+        path (string): the local path to the source image in question.
+
+    Returns:
+        the integer array of classified digits in result of parsing the Sudoku image.
+    """
     original = cv2.imread(path, cv2.IMREAD_COLOR)           # Read in the input file with color
     # show_image(original, title='Original')
     resized = image_resize(original, height=600)            # Resize the image as needed (e.g., 600x600)
@@ -460,6 +524,7 @@ def parse_grid(path):
 
 
 def main():
+    """Entry point of this script if invoked at the command line."""
     if len(args) == 1 or len(args) > 2:
         print("Invalid CLI args. Pass in an image path for a Sudoku puzzle")
     else:
