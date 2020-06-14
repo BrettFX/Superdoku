@@ -195,7 +195,7 @@ def cut_from_rect(img, rect):
     return img[int(rect[0][1]):int(rect[1][1]), int(rect[0][0]):int(rect[1][0])]
 
 
-def centre_pad(length):
+def center_pad(size, length):
     """Handle centering for a given length that may be odd or even."""
     if length % 2 == 0:
         side1 = int((size - length) / 2)
@@ -219,13 +219,13 @@ def scale_and_centre(img, size, margin=0, background=0):
         b_pad = t_pad
         ratio = (size - margin) / h
         w, h = scale(ratio, w), scale(ratio, h)
-        l_pad, r_pad = centre_pad(w)
+        l_pad, r_pad = center_pad(size, w)
     else:
         l_pad = int(margin / 2)
         r_pad = l_pad
         ratio = (size - margin) / w
         w, h = scale(ratio, w), scale(ratio, h)
-        t_pad, b_pad = centre_pad(h)
+        t_pad, b_pad = center_pad(size, h)
 
     img = cv2.resize(img, (w, h))
     img = cv2.copyMakeBorder(img, t_pad, b_pad, l_pad, r_pad, cv2.BORDER_CONSTANT, None, background)
@@ -390,7 +390,8 @@ def get_classified_digits(digits, stage_output):
             if classified_digit == 0:
                 classified_digit = 4    # Common for 4 to be misclassified as 0
 
-            classified_digits.append(classified_digit)
+            # Append the classified digit (convert from numpy.int64 to int)
+            classified_digits.append(int(classified_digit))
         
         i += 1
         

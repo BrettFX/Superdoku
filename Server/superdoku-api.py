@@ -7,7 +7,8 @@ Author: Brett Allen
 import flask
 from flask import request, jsonify
 import datetime
-# import SudokuExtractor
+import os
+import SudokuExtractor
 
 API_BASE_URL = "/superdoku-api"
 
@@ -74,20 +75,21 @@ def recognize():
                 f.write(request.data)
                 f.close()
         
-            response["receipt"] = "Superdoku snap image saved to {}".format(file_path)
-            response["receipt"] = response["receipt"] + "\n|-- data length: {}".format(len(request.data))
+            print("Superdoku snap image saved to {}".format(file_path))
+            print("|-- data length: {}".format(len(request.data)))
 
-            # TODO Pass the image to the SudokuExtractor and get the resulting array
-            # classified_digits = SudokuExtractor.parse_grid(file_path)
+            # Pass the image to the SudokuExtractor and get the resulting array
+            response["puzzle"] = SudokuExtractor.parse_grid(file_path)
 
-            # TODO cleanup and remove temporary sudoku snaped image from the server
+            # Cleanup and remove temporary sudoku snaped image from the server
+            os.remove(file_path)
 
         else:
             response["error"] = "Could not get request data to write file with."
     else:
-       response["error"] = "Could not save image to server. Request header was {}".format(request.headers['Content-Type']) 
+       response["error"] = "Invalid request header: {}. Needs to be application/octet-stream.".format(request.headers['Content-Type']) 
     
-    return response
+    return jsonify(response)
 
 @app.errorhandler(404)
 def page_not_found(e):
