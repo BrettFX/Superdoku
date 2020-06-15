@@ -49,7 +49,7 @@ namespace Superdoku
             GameManager.Instance.InitializePuzzle();
 
             // Load the scanned puzzle if one exists
-            if (puzzleStr != null)
+            if (puzzleStr != null && puzzleStr != "")
             {
                 // Delete the key so that a previously scanned puzzle isn't loaded all the time
                 PlayerPrefs.DeleteKey("ScannedPuzzle");
@@ -250,6 +250,33 @@ namespace Superdoku
                 SolvePuzzle(row, col + 1);
             }
 
+        }
+
+        public bool IsValidSolution()
+        {
+            bool valid = true;
+
+            // Itereate through the current sudoku puzzle and confirm that there isn't a zero in any cell
+            // if there is a zero then we know that solution is not valid
+            for (int row = 0; row < 9; row++)
+            {
+                if (!valid)
+                {
+                    break;
+                }
+
+                for (int col = 0; col < 9; col++)
+                {
+                    // As soon as a cell with 0 is found, the puzzle is invalid
+                    if (sudokuPuzzle[row, col] == 0)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            return valid;
         }
 
         /**

@@ -32,7 +32,8 @@ namespace Superdoku {
         public Color invalidSelectionColor = Color.yellow;
 
         [Header("Miscellaneous")]
-        public GameObject modalOverlay;
+        public GameObject cameraModal;
+        public GameObject errorModal;
         
         private bool m_solved = false;
 
@@ -173,11 +174,20 @@ namespace Superdoku {
             //Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
             PuzzleGrid.Instance.SolvePuzzle(0, 0);
 
-            if (DEBUG_MODE) { Debug.Log("\nHere is the solution:\n"); }
-            PuzzleGrid.Instance.Show();
+            // Validate solved puzzle to ensure that a solution was found (e.g., solution exists)
+            if (PuzzleGrid.Instance.IsValidSolution())
+            {
+                if (DEBUG_MODE) { Debug.Log("\nHere is the solution:\n"); }
+                PuzzleGrid.Instance.Show();
 
-            endTime = Time.deltaTime * 1000.0f;
-            if (DEBUG_MODE) { Debug.Log("Solution took " + (endTime - startTime) + " millisecond(s) to derive."); }
+                endTime = Time.deltaTime * 1000.0f;
+                if (DEBUG_MODE) { Debug.Log("Solution took " + (endTime - startTime) + " millisecond(s) to derive."); }
+            }
+            else
+            {
+                Debug.Log("Solution not valid. No solution possible.");
+                errorModal.SetActive(true);
+            }
 
             // Deselect current active cell
             m_currentActiveCell = null;
@@ -199,7 +209,7 @@ namespace Superdoku {
             return m_solved;
         }
 
-        public void OnModalOverlay()
+        public void OnModalOverlay(GameObject modalOverlay)
         {
             modalOverlay.SetActive(true);
         }
@@ -210,7 +220,7 @@ namespace Superdoku {
         public void OnCamera() {
             // Deselect current active cell
             m_currentActiveCell = null;
-            modalOverlay.SetActive(false);
+            cameraModal.SetActive(false);
             if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
 
             // Change to web cam scene
@@ -221,14 +231,14 @@ namespace Superdoku {
         {
             // Deselect current active cell
             m_currentActiveCell = null;
-            modalOverlay.SetActive(false);
+            cameraModal.SetActive(false);
             if (DEBUG_MODE) { Debug.Log("Launching gallery scene..."); }
 
             // Open file chooser dialog (using SimpleFileBrowser)
             StartCoroutine(ShowLoadDialogCoroutine());
         }
 
-        public void OnCancelModalOverlay()
+        public void OnCancelModalOverlay(GameObject modalOverlay)
         {
             modalOverlay.SetActive(false);
         }
