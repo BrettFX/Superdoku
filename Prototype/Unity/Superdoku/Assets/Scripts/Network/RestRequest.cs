@@ -12,8 +12,42 @@ namespace Superdoku
 {
     public class RestRequest : MonoBehaviour
     {
+        // Static Refs //
+        private static RestRequest instance;
+        public static RestRequest Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
         public GameObject testImage;
-        private const string BASE_URL = "http://localhost:5000/superdoku-api/{0}";
+        public const string BASE_URL = "http://localhost:5000/superdoku-api/{0}";
+
+        /**
+         * Ensure this class remains a singleton instance
+         * */
+        void Awake()
+        {
+            // If the instance variable is already assigned...
+            if (instance != null)
+            {
+                // If the instance is currently active...
+                if (instance.gameObject.activeInHierarchy == true)
+                {
+                    // Warn the user that there are multiple Game Managers within the scene and destroy the old manager.
+                    Debug.LogWarning("There are multiple instances of the RestRequest script. Removing the old instance from the scene.");
+                    Destroy(instance.gameObject);
+                }
+
+                // Remove the old manager.
+                instance = null;
+            }
+
+            // Assign the instance variable as the Game Manager script on this object.
+            instance = GetComponent<RestRequest>();
+        }
 
         public string SendRequest(string url, string method, byte[] data)
         {

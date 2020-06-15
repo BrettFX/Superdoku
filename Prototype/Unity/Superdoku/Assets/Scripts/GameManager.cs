@@ -380,7 +380,10 @@ namespace Superdoku {
             {
                 // If a file was chosen, read its bytes via FileBrowserHelpers
                 // Contrary to File.ReadAllBytes, this function works on Android 10+, as well
-                byte[] bytes = FileBrowserHelpers.ReadBytesFromFile(FileBrowser.Result);
+                byte[] data = FileBrowserHelpers.ReadBytesFromFile(FileBrowser.Result);
+
+                // Send the file data to the superdoku api to recognize and classifiy its digits
+                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
             }
         }
     }
