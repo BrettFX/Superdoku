@@ -31,6 +31,7 @@ namespace Superdoku
     {
         public GameObject btnBack;
         public GameObject btnSnap;
+        public GameObject scanner;
         
         //public static SpecialFolder BASE_OUT_DIR = SpecialFolder.LocalApplicationData;
         //public string OUTPUT_DIR = BASE_OUT_DIR + "/Superdoku";
@@ -129,11 +130,20 @@ namespace Superdoku
 
         private void ToggleAnimation(bool b)
         {
+            // Handle back button animation
             Animator btnBackAnimator = btnBack.GetComponent<Animator>();
             btnBackAnimator.SetTrigger(b ? "ScanStart" : "ScanFinish");
 
+            // Handle snap button animation
             Animator btnSnapAnimator = btnSnap.GetComponent<Animator>();
             btnSnapAnimator.SetTrigger(b ? "ScanStart" : "ScanFinish");
+
+            // Handle scanner animation
+            scanner.SetActive(b);
+            //ParticleSystem scannerParticles = scanner.GetComponentInChildren<ParticleSystem>();
+            //scannerParticles.Pause(!b); // Inverse logic
+            Animator scannerAnimator = scanner.GetComponent<Animator>();
+            scannerAnimator.SetTrigger(b ? "ScanStart" : "ScanFinish");
         }
 
         public void OnBack()
@@ -172,34 +182,40 @@ namespace Superdoku
 
             //yield return new WaitForEndOfImageProcessing(webCamTexture);
 
-            //yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
 
             // yield on a new YieldInstruction that waits for n seconds (Debugging).
-            yield return new WaitForSeconds(5);
+            //yield return new WaitForSeconds(5);
 
             // Get the texture2d representation from the webcam snap
-            //Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
-            //photo.SetPixels(webCamTexture.GetPixels());
-            //photo.Apply();
+            Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
+            photo.SetPixels(webCamTexture.GetPixels());
+            photo.Apply();
 
-            //// Encode webcam texture to png to get the byte array data
-            //byte[] data = photo.EncodeToPNG();
+            // Encode webcam texture to png to get the byte array data
+            byte[] data = photo.EncodeToPNG();
 
-            //// Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
-            //RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+            // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
+            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
 
             // Return back to original state to test animations
-            m_snapped = false;
-            ToggleAnimation(m_snapped);
+            //m_snapped = false;
+            //ToggleAnimation(m_snapped);
 
-            // Play the webcam again
-            if (!webCamTexture.isPlaying)
-            {
-                webCamTexture.Play();
-            }
+            //// Play the webcam again
+            //if (!webCamTexture.isPlaying)
+            //{
+            //    webCamTexture.Play();
+            //}
 
             // After we have waited 5 seconds print the time again.
             Debug.Log("Finished processing at timestamp: " + Time.time);
+        }
+
+        private void OnDestroy()
+        {
+            // Stop the webcam so it can be used again after recycling the scene associated with this instance
+            webCamTexture.Stop();
         }
 
         /**
