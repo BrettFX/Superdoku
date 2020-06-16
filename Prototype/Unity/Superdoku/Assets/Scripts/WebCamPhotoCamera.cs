@@ -150,14 +150,16 @@ namespace Superdoku
             //await Task.Delay(5000);
             await Task.Run(() =>
             {
-               // TODO Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
+                // Get the texture2d representation from the webcam snap
+                Texture2D photo = new Texture2D(wct.width, wct.height);
+                photo.SetPixels(wct.GetPixels());
+                photo.Apply();
 
+                // Encode webcam texture to png to get the byte array data
+                byte[] data = photo.EncodeToPNG();
 
-                //int count = 0;
-                //while (count < 1000000000)
-                //{
-                //    count++;
-                //}
+                // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
+                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
             });
         }
         
@@ -166,14 +168,25 @@ namespace Superdoku
             // Keep track of processing time
             Debug.Log("Began processing image at timestamp: " + Time.time);
 
-            yield return ProcessImageAsync(webCamTexture).AsIEnumerator();
+            //yield return ProcessImageAsync(webCamTexture).AsIEnumerator();
 
             //yield return new WaitForEndOfImageProcessing(webCamTexture);
 
             //yield return new WaitForEndOfFrame();
 
             // yield on a new YieldInstruction that waits for n seconds (Debugging).
-            //yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(5);
+
+            // Get the texture2d representation from the webcam snap
+            //Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
+            //photo.SetPixels(webCamTexture.GetPixels());
+            //photo.Apply();
+
+            //// Encode webcam texture to png to get the byte array data
+            //byte[] data = photo.EncodeToPNG();
+
+            //// Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
+            //RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
 
             // Return back to original state to test animations
             m_snapped = false;
