@@ -97,4 +97,4 @@ def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 # Run the flask app to begin listening on port 5000 (allow all TCP traffic)
-app.run(host='0.0.0.0')
+app.run(host='0.0.0.0', port=5000, threaded=False)
