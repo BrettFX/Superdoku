@@ -31,9 +31,10 @@ namespace Superdoku {
         public Color invalidTextColor = Color.white;
         public Color invalidSelectionColor = Color.yellow;
 
-        [Header("Miscellaneous")]
+        [Header("Modals")]
         public GameObject cameraModal;
         public GameObject errorModal;
+        public GameObject loadingModal;
         
         private bool m_solved = false;
 
@@ -378,6 +379,10 @@ namespace Superdoku {
 
             if (FileBrowser.Success)
             {
+                // Start loading modal. 
+                // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
+                loadingModal.SetActive(true);
+
                 // If a file was chosen, read its bytes via FileBrowserHelpers
                 // Contrary to File.ReadAllBytes, this function works on Android 10+, as well
                 byte[] data = FileBrowserHelpers.ReadBytesFromFile(FileBrowser.Result);
