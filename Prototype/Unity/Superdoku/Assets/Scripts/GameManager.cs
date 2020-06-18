@@ -35,6 +35,9 @@ namespace Superdoku {
         public GameObject cameraModal;
         public GameObject errorModal;
         public GameObject loadingModal;
+
+        [Header("Error Handle")]
+        public Text errorMsgText;
         
         private bool m_solved = false;
 
@@ -64,6 +67,18 @@ namespace Superdoku {
         void Start()
         {
             InitializeFileBrowser();
+
+            // Handle case when rest request error occurred
+            string requestError = PlayerPrefs.GetString("RestRequestError");
+            if (requestError != null && requestError != "")
+            {
+                // Display appropriate error modal
+                errorMsgText.text = requestError;
+                errorModal.SetActive(true);
+
+                // Remove RestRequestError key from player prefs
+                PlayerPrefs.DeleteKey("RestRequestError");
+            }
         }
 
         /**
@@ -187,6 +202,11 @@ namespace Superdoku {
             else
             {
                 Debug.Log("Solution not valid. No solution possible.");
+                // Set error message text
+                string msg = "A solution does not exist for the given Sudoku puzzle. " +
+                             "Please make sure the puzzle has been entered or loaded" +
+                             " correctly and try to solve again.";
+                errorMsgText.text = msg;
                 errorModal.SetActive(true);
             }
 

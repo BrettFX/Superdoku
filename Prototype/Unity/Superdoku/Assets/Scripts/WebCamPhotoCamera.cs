@@ -57,7 +57,7 @@ namespace Superdoku
 
             //webCamTexture = new WebCamTexture(frontCamName);
 
-            webCamTexture = new WebCamTexture();
+            webCamTexture = new WebCamTexture(Screen.width, Screen.height);
             webCamTexture.Play();
         }
 

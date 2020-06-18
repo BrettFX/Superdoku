@@ -114,7 +114,9 @@ namespace Superdoku
             {
                 Debug.Log(request.error);
 
-                // TODO set error flag in player prefs so that an error message can be displayed to the user in the main scene
+                // Set error flag in player prefs so that an error message can be displayed to the user in the main scene
+                PlayerPrefs.SetString("RestRequestError", request.error);
+                SceneManager.LoadScene(GameManager.HOME_SCENE);
             }
             else
             {

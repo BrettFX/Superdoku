@@ -4514,6 +4514,11 @@ PrefabInstance:
       propertyPath: loadingModal
       value: 
       objectReference: {fileID: 5607279213365525845}
+    - target: {fileID: 1375435835988427302, guid: c6ca0e647fe8b734bb4af7f29ca842ab,
+        type: 3}
+      propertyPath: errorMsgText
+      value: 
+      objectReference: {fileID: 1431372541}
     - target: {fileID: 2645385403542285213, guid: c6ca0e647fe8b734bb4af7f29ca842ab,
         type: 3}
       propertyPath: m_LocalPosition.x
