@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ImageProcessorScene.unity
     guid: 6849cb434511a0f40915d774c45411b9
+  - enabled: 1
+    path: Assets/Scenes/Debug/NativeCameraDemo.unity
+    guid: 431a2670c32323440b18bb63ae581fdc
   m_configObjects: {}

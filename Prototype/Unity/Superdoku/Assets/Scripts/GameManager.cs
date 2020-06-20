@@ -19,8 +19,8 @@ namespace Superdoku {
 
         public const bool DEBUG_MODE = true;
         public const int HOME_SCENE = 0;
-        public const int WEB_CAM_SCENE = 1;
-        public const int IMAGE_PROCESSOR_SCENE = 2;
+        public const int WEB_CAM_SCENE = 3; // 1 for actual, 3 for debug
+        public const int IMAGE_PROCESSOR_SCENE = 2; 
         public const string IMAGE_PATH_KEY = "CurrentImagePath";
 
         [Header("Cell Management")]
