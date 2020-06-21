@@ -10,7 +10,7 @@ namespace Kakera
 	{
 		public void Show(string title, string outputFileName, int maxSize)
 		{
-			var path = EditorUtility.OpenFilePanel(title, "","png");
+			var path = EditorUtility.OpenFilePanel(title, "","png, jpg");
 			if (path.Length != 0) {
 				string destination = Application.persistentDataPath + "/" + outputFileName;
 				if (File.Exists(destination))

@@ -1,4 +1,5 @@
-﻿using SimpleFileBrowser;
+﻿using Kakera;
+using SimpleFileBrowser;
 using System.Collections;
 using System.IO;
 using UnityEditor;
@@ -36,9 +37,13 @@ namespace Superdoku {
         public GameObject errorModal;
         public GameObject loadingModal;
 
+        [Header("Plugins")]
+        [SerializeField]
+        private Unimgpicker imagePicker;
+
         [Header("Error Handle")]
         public Text errorMsgText;
-        
+
         private bool m_solved = false;
 
         private static GameObject m_currentActiveCell;
@@ -62,6 +67,12 @@ namespace Superdoku {
 
             // Assign the instance variable as the Game Manager script on this object.
             instance = GetComponent < GameManager > ();
+
+            // Add the Completed handle function for when the user has selected an image
+            imagePicker.Completed += (string path) =>
+            {
+                StartCoroutine(ShowLoadDialogCoroutine(path));
+            };
         }
 
         void Start()
@@ -255,8 +266,8 @@ namespace Superdoku {
             cameraModal.SetActive(false);
             if (DEBUG_MODE) { Debug.Log("Launching gallery scene..."); }
 
-            // Open file chooser dialog (using SimpleFileBrowser)
-            StartCoroutine(ShowLoadDialogCoroutine());
+            // Open image picker (using Unimgpicker)
+            imagePicker.Show("Select Image", "unimgpicker", 1024);
         }
 
         public void OnCancelModalOverlay(GameObject modalOverlay)
@@ -386,30 +397,50 @@ namespace Superdoku {
          * Coroutine for SimpleFileBrowser to show file loading dialog. Yields so that
          * Game waits for response
          */
-        IEnumerator ShowLoadDialogCoroutine()
+        IEnumerator ShowLoadDialogCoroutine(string path)
         {
+            var url = "file://" + path;
+            var www = new WWW(url);
+            yield return www;
+
+            var texture = www.texture;
+            if (texture == null)
+            {
+                Debug.LogError("Failed to load texture url:" + url);
+            }
+
+            // Start loading modal. 
+            // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
+            loadingModal.SetActive(true);
+
+            // Get texture data
+            byte[] data = texture.EncodeToPNG();
+
+            // Send the file data to the superdoku api to recognize and classifiy its digits
+            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+
             // Show a load file dialog and wait for a response from user
             // Load file/folder: file, Initial path: default (Documents), Title: "Load File", submit button text: "Load"
-            yield return FileBrowser.WaitForLoadDialog(false, null, "Load File", "Load");
+            //yield return FileBrowser.WaitForLoadDialog(false, null, "Load File", "Load");
 
-            // Dialog is closed
-            // Print whether a file is chosen (FileBrowser.Success)
-            // and the path to the selected file (FileBrowser.Result) (null, if FileBrowser.Success is false)
-            Debug.Log(FileBrowser.Success + " " + FileBrowser.Result);
+            //// Dialog is closed
+            //// Print whether a file is chosen (FileBrowser.Success)
+            //// and the path to the selected file (FileBrowser.Result) (null, if FileBrowser.Success is false)
+            //Debug.Log(FileBrowser.Success + " " + FileBrowser.Result);
 
-            if (FileBrowser.Success)
-            {
-                // Start loading modal. 
-                // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
-                loadingModal.SetActive(true);
+            //if (FileBrowser.Success)
+            //{
+            //    // Start loading modal. 
+            //    // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
+            //    loadingModal.SetActive(true);
 
-                // If a file was chosen, read its bytes via FileBrowserHelpers
-                // Contrary to File.ReadAllBytes, this function works on Android 10+, as well
-                byte[] data = FileBrowserHelpers.ReadBytesFromFile(FileBrowser.Result);
+            //    // If a file was chosen, read its bytes via FileBrowserHelpers
+            //    // Contrary to File.ReadAllBytes, this function works on Android 10+, as well
+            //    byte[] data = FileBrowserHelpers.ReadBytesFromFile(FileBrowser.Result);
 
-                // Send the file data to the superdoku api to recognize and classifiy its digits
-                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
-            }
+            //    // Send the file data to the superdoku api to recognize and classifiy its digits
+            //    RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+            //}
         }
     }
 }
