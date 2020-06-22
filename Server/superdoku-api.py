@@ -66,7 +66,7 @@ def recognize():
     )
 
     # Create file path with file timestamp appended
-    file_path = '/tmp/superdoku-snap_{}.png'.format(file_timestamp)
+    file_path = '/tmp/superdoku-snap_{}.jpg'.format(file_timestamp)
 
     # Ensure multipart form-data is being used
     if 'application/octet-stream' in request.headers['Content-Type']:
@@ -82,7 +82,7 @@ def recognize():
             response["puzzle"] = SudokuExtractor.parse_grid(file_path)
 
             # Cleanup and remove temporary sudoku snaped image from the server
-            os.remove(file_path)
+            # os.remove(file_path)
 
         else:
             response["error"] = "Could not get request data to write file with."

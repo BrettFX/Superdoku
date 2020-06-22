@@ -47,8 +47,8 @@ namespace Superdoku
                 return;
 
             // Take a picture with the camera
-            // If the captured image's width and/or height is greater than 512px, down-scale it
-            TakePicture(512);
+            // Don't enforce any limit on the size of the image to ensure the best image quality
+            TakePicture(int.MaxValue);
         }
 
         public void OnVideo()
@@ -83,15 +83,18 @@ namespace Superdoku
                     //Texture2D texture = NativeCamera.LoadImageAtPath(path, maxSize);
                     // Need to load PNG with game manager implementation to prevent Unity texture not readable exception
                     // (e.g., texture memory can't be accessed from script if using NativeCamera.LoadImageAtPath)
-                    Texture2D texture = GameManager.LoadPNG(path);
+                    Texture2D texture = GameManager.LoadImage(path);
                     if (texture == null)
                     {
                         Debug.Log("Couldn't load texture from " + path);
                         return;
                     }
 
-                    // Encode captured image texture to png to get the byte array data
-                    byte[] data = texture.EncodeToPNG();
+                    // Need to rotate the picture
+                    //Texture2D rotatedTexture = GameManager.RotateTexture(texture, true);
+
+                    // Encode captured image texture to jpg to get the byte array data
+                    byte[] data = texture.EncodeToJPG();
 
                     // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
                     RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);

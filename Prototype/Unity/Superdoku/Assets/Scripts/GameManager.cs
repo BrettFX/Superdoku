@@ -38,8 +38,7 @@ namespace Superdoku {
         public GameObject loadingModal;
 
         [Header("Plugins")]
-        [SerializeField]
-        private Unimgpicker imagePicker;
+        public Unimgpicker imagePicker;
 
         [Header("Error Handle")]
         public Text errorMsgText;
@@ -267,7 +266,7 @@ namespace Superdoku {
             if (DEBUG_MODE) { Debug.Log("Launching gallery scene..."); }
 
             // Open image picker (using Unimgpicker)
-            imagePicker.Show("Select Image", "unimgpicker", 1024);
+            imagePicker.Show("Select Image", "unimgpicker", int.MaxValue);
         }
 
         public void OnCancelModalOverlay(GameObject modalOverlay)
@@ -353,7 +352,7 @@ namespace Superdoku {
             return retValue;
         }
 
-        public static Texture2D LoadPNG(string filePath)
+        public static Texture2D LoadImage(string filePath)
         {
 
             Texture2D tex = null;
@@ -393,6 +392,31 @@ namespace Superdoku {
             WriteFile(Application.persistentDataPath, "GrayScaleTest.png", bytes, FileMode.Create);
         }
 
+        public static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
+        {
+            Color32[] original = originalTexture.GetPixels32();
+            Color32[] rotated = new Color32[original.Length];
+            int w = originalTexture.width;
+            int h = originalTexture.height;
+
+            int iRotated, iOriginal;
+
+            for (int j = 0; j < h; ++j)
+            {
+                for (int i = 0; i < w; ++i)
+                {
+                    iRotated = (i + 1) * h - j - 1;
+                    iOriginal = clockwise ? original.Length - 1 - (j * w + i) : j * w + i;
+                    rotated[iRotated] = original[iOriginal];
+                }
+            }
+
+            Texture2D rotatedTexture = new Texture2D(h, w);
+            rotatedTexture.SetPixels32(rotated);
+            rotatedTexture.Apply();
+            return rotatedTexture;
+        }
+
         /**
          * Coroutine for SimpleFileBrowser to show file loading dialog. Yields so that
          * Game waits for response
@@ -413,8 +437,12 @@ namespace Superdoku {
             // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
             loadingModal.SetActive(true);
 
-            // Get texture data
-            byte[] data = texture.EncodeToPNG();
+            //Texture2D rotatedTexture = RotateTexture(texture, true);
+
+            // Get texture data in jpg so it doesn't have to be rotated manually          
+            byte[] data = texture.EncodeToJPG();
+
+            //byte[] data = texture.EncodeToPNG();
 
             // Send the file data to the superdoku api to recognize and classifiy its digits
             RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
