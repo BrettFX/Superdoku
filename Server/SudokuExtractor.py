@@ -40,6 +40,10 @@ def plot_many_images(images, titles, rows=1, columns=2):
 
 def show_image(img, title='image'):
     """Show an image until any key is pressed."""
+    # Don't show digits if entry point wasn't from the command line
+    if __name__ != '__main__':
+        return
+    
     cv2.imshow(title, img)  # Display the image
     cv2.waitKey(0)  # Wait for any key to be pressed (with the image window active)
     cv2.destroyAllWindows()  # Close all windows
@@ -47,6 +51,10 @@ def show_image(img, title='image'):
 
 def show_digits(digits, colour=255):
     """Show list of 81 extracted digits in a grid format."""
+    # Don't show digits if entry point wasn't from the command line
+    if __name__ != '__main__':
+        return
+    
     rows = []
     with_border = [cv2.copyMakeBorder(img.copy(), 1, 1, 1, 1, cv2.BORDER_CONSTANT, None, colour) for img in digits]
     for i in range(9):
@@ -426,19 +434,23 @@ def print_sudoku_puzzle(classified_digits):
 
     Parameters:
         classified_digits ([int]): the array of integers representing the classified digits.
-    """    
+    """
+    # Don't show digits if entry point wasn't from the command line
+    if __name__ != '__main__':
+        return
+     
     # Get the grid array based on the extracted digits
     grid_array = get_grid_array(classified_digits)
 
     # The character to determine formatting
-    display = "";
+    display = ""
 
     # Use the values from the sudokuPuzzle and write them to the respective cell using the txtFieldMap
     for row in range(9):
         display += "\n"
         for col in range(9):
             # Print out a divider every third line
-            display += ("\t" if (col % 3 == 0) else " ") + str(grid_array[row][col]);
+            display += ("\t" if (col % 3 == 0) else " ") + str(grid_array[row][col])
         display += "\n" if ((row + 1) % 3 == 0) else ""
             
     print("\nSudoku Puzzle:")
@@ -493,6 +505,31 @@ def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
     return resized
 
 
+def autocrop(image, threshold=0):
+    """
+    Crop any edges below or equal to threshold.
+
+    Crops blank image to 1x1.
+
+    Returns cropped image.
+
+    """
+    if len(image.shape) == 3:
+        flatImage = np.max(image, 2)
+    else:
+        flatImage = image
+    assert len(flatImage.shape) == 2
+
+    rows = np.where(np.max(flatImage, 0) > threshold)[0]
+    if rows.size:
+        cols = np.where(np.max(flatImage, 1) > threshold)[0]
+        image = image[cols[0]: cols[-1] + 1, rows[0]: rows[-1] + 1]
+    else:
+        image = image[:1, :1]
+
+    return image
+
+
 def parse_grid(path):
     """
     Parse an image of a Sudoku puzzle given a path to the respective image.
@@ -503,23 +540,27 @@ def parse_grid(path):
     Returns:
         the integer array of classified digits in result of parsing the Sudoku image.
     """
-    original = cv2.imread(path, cv2.IMREAD_COLOR)           # Read in the input file with color
-    # show_image(original, title='Original')
-    resized = image_resize(original, height=600)            # Resize the image as needed (e.g., 600x600)
-    # show_image(resized, title='Resized')
-    grayscale = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)   # Convert the image to grayscale for preprocessing
-    # show_image(grayscale, title='Grayscale')
-    processed = pre_process_image(grayscale)                # Preprocess the image to prepare for identifying corners
-    corners = find_corners_of_largest_polygon(processed)    # Find the corners of the Sudoku puzzle
-    cropped = crop_and_warp(grayscale, corners)             # Crop the image to only encompass the Sudoku portion
-    # show_image(cropped, title='Cropped')
-    squares = infer_grid(cropped)                           # Draw squares for each Suduko grid cell
-    digits = get_digits(cropped, squares, 28)               # Grab all the digits from the cells (e.g., roi)
-    # show_digits(digits)                                   # Show the extracted digits
+    original = cv2.imread(path, cv2.IMREAD_COLOR)              # Read in the input file with color
+    show_image(original, title='Original')
+    resized = image_resize(original, height=600)               # Resize the image as needed (e.g., 600x600)
+    show_image(resized, title='Resized')
+    normalized = autocrop(resized, threshold=50)               # Normalize the image by croping black edges from top and bottom
+    show_image(normalized, title='Normalized')
+    grayscale = cv2.cvtColor(normalized, cv2.COLOR_BGR2GRAY)   # Convert the image to grayscale for preprocessing
+    show_image(grayscale, title='Grayscale')
+    processed = pre_process_image(grayscale)                   # Preprocess the image to prepare for identifying corners
+    corners = find_corners_of_largest_polygon(processed)       # Find the corners of the Sudoku puzzle
+    cropped = crop_and_warp(grayscale, corners)                # Crop the image to only encompass the Sudoku portion
+    show_image(cropped, title='Cropped')
+    squares = infer_grid(cropped)                              # Draw squares for each Suduko grid cell
+    digits = get_digits(cropped, squares, 28)                  # Grab all the digits from the cells (e.g., roi)
+    show_digits(digits)
     
     # Get the classified digits (array of digits to be returned as a response)
     classified_digits = get_classified_digits(digits, stage_output=False)
     
+    print_sudoku_puzzle(classified_digits)                     # Print the parsed Sudoku puzzle (unsolved)
+
     # Return parsed classified digits
     return classified_digits
 
