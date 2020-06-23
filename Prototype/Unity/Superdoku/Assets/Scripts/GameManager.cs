@@ -423,24 +423,26 @@ namespace Superdoku {
          */
         IEnumerator ShowLoadDialogCoroutine(string path)
         {
-            var url = "file://" + path;
-            var www = new WWW(url);
-            yield return www;
-
-            var texture = www.texture;
-            if (texture == null)
-            {
-                Debug.LogError("Failed to load texture url:" + url);
-            }
+            //var url = "file://" + path;
+            //var www = new WWW(url);
+            //yield return www;
 
             // Start loading modal. 
             // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
             loadingModal.SetActive(true);
 
+            yield return new WaitForEndOfFrame();
+
+            Texture2D texture = LoadImage(path);
+            if (texture == null)
+            {
+                Debug.LogError("Failed to load texture from:" + path);
+            }
+
             //Texture2D rotatedTexture = RotateTexture(texture, true);
 
-            // Get texture data in jpg so it doesn't have to be rotated manually          
-            byte[] data = texture.EncodeToJPG();
+            // Get texture data in png     
+            byte[] data = texture.EncodeToPNG();
 
             //byte[] data = texture.EncodeToPNG();
 

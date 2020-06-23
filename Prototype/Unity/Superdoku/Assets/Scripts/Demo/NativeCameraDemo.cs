@@ -91,10 +91,10 @@ namespace Superdoku
                     }
 
                     // Need to rotate the picture
-                    //Texture2D rotatedTexture = GameManager.RotateTexture(texture, true);
+                    Texture2D rotatedTexture = GameManager.RotateTexture(texture, true);
 
-                    // Encode captured image texture to jpg to get the byte array data
-                    byte[] data = texture.EncodeToJPG();
+                    // Encode captured image texture to png to get the byte array data
+                    byte[] data = rotatedTexture.EncodeToPNG();
 
                     // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
                     RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);

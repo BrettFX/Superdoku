@@ -66,7 +66,7 @@ def recognize():
     )
 
     # Create file path with file timestamp appended
-    file_path = '/tmp/superdoku-snap_{}.jpg'.format(file_timestamp)
+    file_path = '/tmp/superdoku-snap_{}.png'.format(file_timestamp)
 
     # Ensure multipart form-data is being used
     if 'application/octet-stream' in request.headers['Content-Type']:
