@@ -97,7 +97,9 @@ namespace Superdoku
                     byte[] data = rotatedTexture.EncodeToPNG();
 
                     // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
-                    RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+                    // TODO perform same preprocessing on jpg images with GameManager to ensure proper image orientation
+                    RequestContent content = new RequestContent(data, "jpg");
+                    RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", content);
 
                     // Assign texture to a temporary quad and destroy it after 5 seconds
                     //GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);

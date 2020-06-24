@@ -8,6 +8,7 @@ import flask
 from flask import request, jsonify
 import datetime
 import os
+import re
 import SudokuExtractor
 
 API_BASE_URL = "/superdoku-api"
@@ -65,8 +66,13 @@ def recognize():
         now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond
     )
 
-    # Create file path with file timestamp appended
-    file_path = '/tmp/superdoku-snap_{}.png'.format(file_timestamp)
+    # Get file type from content disposition in request header
+    pattern = re.compile("filetype[^;=\n]*=((['\"]).*?\2|[^;\n]*)")
+    result = pattern.search(request.headers["Content-Disposition"])
+    file_type = result.group(1)
+
+    # Create file path with file timestamp appended and dynamically set file extension based on file type
+    file_path = '/tmp/superdoku-snap_{}.{}'.format(file_timestamp, "jpg" if "jpg" in file_type.lower() else "png")
 
     # Ensure multipart form-data is being used
     if 'application/octet-stream' in request.headers['Content-Type']:
@@ -82,7 +88,7 @@ def recognize():
             response["puzzle"] = SudokuExtractor.parse_grid(file_path)
 
             # Cleanup and remove temporary sudoku snaped image from the server
-            # os.remove(file_path)
+            os.remove(file_path)
 
         else:
             response["error"] = "Could not get request data to write file with."

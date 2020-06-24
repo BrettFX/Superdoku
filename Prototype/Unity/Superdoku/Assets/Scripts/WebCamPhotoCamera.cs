@@ -169,7 +169,8 @@ namespace Superdoku
                 byte[] data = photo.EncodeToPNG();
 
                 // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
-                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+                RequestContent content = new RequestContent(data, "png");
+                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", content);
             });
         }
         
@@ -196,7 +197,8 @@ namespace Superdoku
             byte[] data = photo.EncodeToPNG();
 
             // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
-            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+            RequestContent content = new RequestContent(data, "png");
+            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", content);
 
             // Return back to original state to test animations
             //m_snapped = false;

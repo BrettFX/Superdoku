@@ -49,9 +49,10 @@ namespace Kakera
 
             // Get texture data
             byte[] data = texture.EncodeToPNG();
-            
+
             // Send the file data to the superdoku api to recognize and classifiy its digits
-            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+            RequestContent content = new RequestContent(data, "png");
+            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", content);
         }
     }
 }

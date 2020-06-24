@@ -1,10 +1,12 @@
-﻿using Kakera;
+﻿using ExifLib;
+using Kakera;
 using SimpleFileBrowser;
 using System.Collections;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -417,60 +419,109 @@ namespace Superdoku {
             return rotatedTexture;
         }
 
+        public Texture2D CorrectRotation(Texture2D texture, string orientationString)
+        {
+            // tries to use the jpi.Orientation to rotate the image properly
+            //newTexture = (Texture2D)imageHolder.texture;
+
+            switch (orientationString)
+            {
+                case "TopRight": // Rotate clockwise 90 degrees
+                    texture = RotateTexture(texture, true);
+                    break;
+                case "TopLeft": // Rotate 0 degrees...
+                    break;
+                case "BottomRight": // Rotate clockwise 180 degrees
+                    texture = RotateTexture(texture, true);
+                    texture = RotateTexture(texture, true);
+                    break;
+                case "BottomLeft": // Rotate clockwise 270 degrees (I think?)...
+                    texture = RotateTexture(texture, true);
+                    texture = RotateTexture(texture, true);
+                    break;
+                default:
+                    break;
+            }
+
+            return texture;
+        }
+
         /**
          * Coroutine for SimpleFileBrowser to show file loading dialog. Yields so that
          * Game waits for response
          */
         IEnumerator ShowLoadDialogCoroutine(string path)
         {
-            //var url = "file://" + path;
-            //var www = new WWW(url);
-            //yield return www;
-
             // Start loading modal. 
             // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
             loadingModal.SetActive(true);
 
-            yield return new WaitForEndOfFrame();
+            Debug.Log("Processing file: " + path);
 
-            Texture2D texture = LoadImage(path);
-            if (texture == null)
+            UnityWebRequest www = UnityWebRequest.Get("file://" + path);
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
             {
-                Debug.LogError("Failed to load texture from:" + path);
+                Debug.Log(www.error);
             }
+            else
+            {
+                // retrieve results as binary data
+                byte[] results = www.downloadHandler.data;
+                Texture2D tex = new Texture2D(2, 2);
+                tex.LoadImage(results);
 
-            //Texture2D rotatedTexture = RotateTexture(texture, true);
+                // Build a request content object
+                RequestContent requestContent = new RequestContent();
 
-            // Get texture data in png     
-            byte[] data = texture.EncodeToPNG();
+                Debug.Log("Finished Getting Image -> SIZE: " + results.Length.ToString());
+                JpegInfo jpi = ExifReader.ReadJpeg(results, "LoadedFile");
 
-            //byte[] data = texture.EncodeToPNG();
+                // Determine if the provided file was a jpg or not
+                bool isJpg = jpi.IsValid;
+                Debug.Log("Loaded image is in " + (isJpg ? "JPG" : "PNG") + " format.");
 
-            // Send the file data to the superdoku api to recognize and classifiy its digits
-            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
+                // If it's a jpg image then we need to do some preprocessing before invoking the rest request
+                if (isJpg)
+                {
+                    double[] Latitude = jpi.GpsLatitude;
+                    double[] Longitude = jpi.GpsLongitude;
+                    string orientationString = jpi.Orientation.ToString();
 
-            // Show a load file dialog and wait for a response from user
-            // Load file/folder: file, Initial path: default (Documents), Title: "Load File", submit button text: "Load"
-            //yield return FileBrowser.WaitForLoadDialog(false, null, "Load File", "Load");
+                    string exifDataStr = "<b>Exif Data:</b>" + "<color=white>";
+                    exifDataStr = exifDataStr + "\n" + "FileName: " + jpi.FileName;
+                    exifDataStr = exifDataStr + "\n" + "DateTime: " + jpi.DateTime;
+                    exifDataStr = exifDataStr + "\n" + "GpsLatitude: " + Latitude[0] + "° " + Latitude[1] + "' " + Latitude[2] + '"';
+                    exifDataStr = exifDataStr + "\n" + "GpsLongitude: " + Longitude[0] + "° " + Longitude[1] + "' " + Longitude[2] + '"';
+                    exifDataStr = exifDataStr + "\n" + "Description: " + jpi.Description;
+                    exifDataStr = exifDataStr + "\n" + "Height: " + jpi.Height + " pixels";
+                    exifDataStr = exifDataStr + "\n" + "Width: " + jpi.Width + " pixels";
+                    exifDataStr = exifDataStr + "\n" + "ResolutionUnit: " + jpi.ResolutionUnit;
+                    exifDataStr = exifDataStr + "\n" + "UserComment: " + jpi.UserComment;
+                    exifDataStr = exifDataStr + "\n" + "Make: " + jpi.Make;
+                    exifDataStr = exifDataStr + "\n" + "Model: " + jpi.Model;
+                    exifDataStr = exifDataStr + "\n" + "Software: " + jpi.Software;
+                    exifDataStr = exifDataStr + "\n" + "Orientation: " + orientationString;
+                    exifDataStr = exifDataStr + "</color>";
 
-            //// Dialog is closed
-            //// Print whether a file is chosen (FileBrowser.Success)
-            //// and the path to the selected file (FileBrowser.Result) (null, if FileBrowser.Success is false)
-            //Debug.Log(FileBrowser.Success + " " + FileBrowser.Result);
+                    Debug.Log(exifDataStr);
 
-            //if (FileBrowser.Success)
-            //{
-            //    // Start loading modal. 
-            //    // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
-            //    loadingModal.SetActive(true);
+                    // Assure the corrent orientation of the provided jpg image
+                    tex = CorrectRotation(tex, jpi.Orientation.ToString());
+                    requestContent.data = tex.EncodeToJPG();
+                    requestContent.filetype = "jpg";
+                }
+                else
+                {
+                    // Otherwise the image isn't a jpg and we can process it normally
+                    requestContent.data = tex.EncodeToPNG();
+                    requestContent.filetype = "png";
+                }
 
-            //    // If a file was chosen, read its bytes via FileBrowserHelpers
-            //    // Contrary to File.ReadAllBytes, this function works on Android 10+, as well
-            //    byte[] data = FileBrowserHelpers.ReadBytesFromFile(FileBrowser.Result);
-
-            //    // Send the file data to the superdoku api to recognize and classifiy its digits
-            //    RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", data);
-            //}
+                // Send the file data to the superdoku api to recognize and classifiy its digits
+                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", requestContent);
+            }
         }
     }
 }

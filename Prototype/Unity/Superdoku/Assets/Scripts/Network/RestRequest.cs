@@ -10,6 +10,24 @@ using UnityEngine.UI;
 
 namespace Superdoku
 {
+    public class RequestContent
+    {
+        public RequestContent()
+        {
+            data = null;
+            filetype = "";
+        }
+
+        public RequestContent(byte[] data, string filetype)
+        {
+            this.data = data;
+            this.filetype = filetype;
+        }
+
+        public byte[] data;
+        public string filetype;
+    }
+
     public class RestRequest : MonoBehaviour
     {
         // Static Refs //
@@ -49,7 +67,7 @@ namespace Superdoku
             instance = GetComponent<RestRequest>();
         }
 
-        public string SendRequest(string url, string method, byte[] data)
+        public string SendRequest(string url, string method, RequestContent content)
         {
             Debug.Log("URL: " + url);
             Debug.Log("Method: " + method);
@@ -69,7 +87,7 @@ namespace Superdoku
                 case "PUT":
                     // Use UnityWebRequest to send post request with data in request body
                     // See: https://docs.unity3d.com/Manual/UnityWebRequest-UploadingRawData.html
-                    StartCoroutine(Upload(url, data));
+                    StartCoroutine(Upload(url, content));
                     break;
             }
 
@@ -100,14 +118,16 @@ namespace Superdoku
         {
             RawImage raw = testImage.GetComponent<RawImage>();
             Texture2D img = (Texture2D)raw.texture;
-            SendRequest(string.Format(BASE_URL, "recognize"), "PUT", img.EncodeToPNG());
+            RequestContent content = new RequestContent(img.EncodeToPNG(), "sample.png");
+            SendRequest(string.Format(BASE_URL, "recognize"), "PUT", content);
         }
 
-        IEnumerator Upload(string url, byte[] data)
+        IEnumerator Upload(string url, RequestContent content)
         {
             
-            UnityWebRequest request = UnityWebRequest.Put(url, data);
+            UnityWebRequest request = UnityWebRequest.Put(url, content.data);
             request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("Content-Disposition", "attachment; filetype=\"" + content.filetype + "\"");
             yield return request.SendWebRequest();
 
             if (request.isNetworkError || request.isHttpError)
