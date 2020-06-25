@@ -1,9 +1,6 @@
 ﻿using ExifLib;
 using Kakera;
-using SimpleFileBrowser;
 using System.Collections;
-using System.IO;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -22,8 +19,7 @@ namespace Superdoku {
 
         public const bool DEBUG_MODE = true;
         public const int HOME_SCENE = 0;
-        public const int WEB_CAM_SCENE = 3; // 1 for actual, 3 for debug
-        public const int IMAGE_PROCESSOR_SCENE = 2; 
+        public const int WEB_CAM_SCENE = 1;
         public const string IMAGE_PATH_KEY = "CurrentImagePath";
 
         [Header("Cell Management")]
@@ -78,8 +74,6 @@ namespace Superdoku {
 
         void Start()
         {
-            InitializeFileBrowser();
-
             // Handle case when rest request error occurred
             string requestError = PlayerPrefs.GetString("RestRequestError");
             if (requestError != null && requestError != "")
@@ -103,51 +97,6 @@ namespace Superdoku {
             PuzzleGrid.Instance.Clear();
             SetSolved(false);
             if (DEBUG_MODE) { Debug.Log("Puzzle initialized"); }
-        }
-        
-        /**
-         * Perform setup tasks for SimpleFileBrowser plugin to prepare for loading
-         * photos
-         */
-        public void InitializeFileBrowser()
-        {
-            // Set filters (optional)
-            // It is sufficient to set the filters just once (instead of each time before showing the file browser dialog), 
-            // if all the dialogs will be using the same filters
-            FileBrowser.SetFilters(true, new FileBrowser.Filter("Images", ".jpg", ".png"), new FileBrowser.Filter("Text Files", ".txt", ".pdf"));
-
-            // Set default filter that is selected when the dialog is shown (optional)
-            // Returns true if the default filter is set successfully
-            // In this case, set Images filter as the default filter
-            FileBrowser.SetDefaultFilter(".png");
-
-            // Set excluded file extensions (optional) (by default, .lnk and .tmp extensions are excluded)
-            // Note that when you use this function, .lnk and .tmp extensions will no longer be
-            // excluded unless you explicitly add them as parameters to the function
-            FileBrowser.SetExcludedExtensions(".lnk", ".tmp", ".zip", ".rar", ".exe");
-
-            // Add a new quick link to the browser (optional) (returns true if quick link is added successfully)
-            // It is sufficient to add a quick link just once
-            // Name: Users
-            // Path: C:\Users
-            // Icon: default (folder icon)
-            FileBrowser.AddQuickLink("Users", "C:\\Users", null);
-
-            // Show a save file dialog 
-            // onSuccess event: not registered (which means this dialog is pretty useless)
-            // onCancel event: not registered
-            // Save file/folder: file, Initial path: "C:\", Title: "Save As", submit button text: "Save"
-            // FileBrowser.ShowSaveDialog( null, null, false, "C:\\", "Save As", "Save" );
-
-            // Show a select folder dialog 
-            // onSuccess event: print the selected folder's path
-            // onCancel event: print "Canceled"
-            // Load file/folder: folder, Initial path: default (Documents), Title: "Select Folder", submit button text: "Select"
-            // FileBrowser.ShowLoadDialog( (path) => { Debug.Log( "Selected: " + path ); }, 
-            //                                () => { Debug.Log( "Canceled" ); }, 
-            //                                true, null, "Select Folder", "Select" );
-
-            
         }
 
         /**
@@ -257,7 +206,15 @@ namespace Superdoku {
             if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
 
             // Change to web cam scene
-            SceneManager.LoadScene(WEB_CAM_SCENE);
+            //SceneManager.LoadScene(WEB_CAM_SCENE);
+
+            // Don't attempt to use the camera if it is already open
+            if (NativeCamera.IsCameraBusy())
+                return;
+
+            // Take a picture with the camera
+            // Don't enforce any limit on the size of the image to ensure the best image quality
+            TakePicture(int.MaxValue);
         }
 
         public void OnGallery()
@@ -311,89 +268,15 @@ namespace Superdoku {
                 // Otherwise set the text color to the default color
                 text.color = defaultTextColor;
             }
-            
 
             // Commit the button color change
             button.colors = colors;
         }
 
         /**
-         * Write a file to the local file system provided with the bytes data of the respecive file
-         
-         * @param string path the base path to where the file is to be written
-         * @param string fileName the name of the file to be written
-         * @param byte[] bytes the array of bytes representing the data of the file
-         * @param FileMode mode the writing strategy to perform on the file
-         * 
-         * @see https://answers.unity.com/questions/1397703/system-io-file-directory-problem.html
-         * @see System.IO.FileMode
+         * Rotate a given Texture2D 90 degrees either clockwise or counterclockwise based on the 
+         * value of the respective clockwise flag.
          */
-        public static bool WriteFile(string path, string fileName, byte[] bytes, FileMode mode)
-        {
-            if (DEBUG_MODE) { Debug.Log("Writing to " + path + "/" + fileName); }
-
-            bool retValue = false;
-            string dataPath = path;
-
-            if (!Directory.Exists(dataPath))
-            {
-                Directory.CreateDirectory(dataPath);
-            }
-            dataPath += "/" + fileName;
-            try
-            {
-                File.WriteAllBytes(dataPath, bytes);
-                retValue = true;
-            }
-            catch (System.Exception ex)
-            {
-                string ErrorMessages = "File Write Error\n" + ex.Message;
-                retValue = false;
-                Debug.LogError(ErrorMessages);
-            }
-            return retValue;
-        }
-
-        public static Texture2D LoadImage(string filePath)
-        {
-
-            Texture2D tex = null;
-            byte[] fileData;
-
-            if (File.Exists(filePath))
-            {
-                fileData = File.ReadAllBytes(filePath);
-                tex = new Texture2D(0, 0, TextureFormat.BGRA32, false);
-                tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
-            }
-
-            return tex;
-        }
-
-        public static void ConvertToGrayscale(Texture2D texture)
-        {
-            Color32[] pixels = texture.GetPixels32();
-            for (int x = 0; x < texture.width; x++)
-            {
-                for (int y = 0; y < texture.height; y++)
-                {
-                    Color32 pixel = pixels[x + y * texture.width];
-                    int p = ((256 * 256 + pixel.r) * 256 + pixel.b) * 256 + pixel.g;
-                    int b = p % 256;
-                    p = Mathf.FloorToInt(p / 256);
-                    int g = p % 256;
-                    p = Mathf.FloorToInt(p / 256);
-                    int r = p % 256;
-                    float l = (0.2126f * r / 255f) + 0.7152f * (g / 255f) + 0.0722f * (b / 255f);
-                    Color c = new Color(l, l, l, 1);
-                    texture.SetPixel(x, y, c);
-                }
-            }
-            texture.Apply(false);
-            byte[] bytes = texture.EncodeToPNG();
-            WriteFile(Application.persistentDataPath, "GrayScaleTest.png", bytes, FileMode.Create);
-        }
-
         public static Texture2D RotateTexture(Texture2D originalTexture, bool clockwise)
         {
             Color32[] original = originalTexture.GetPixels32();
@@ -419,6 +302,11 @@ namespace Superdoku {
             return rotatedTexture;
         }
 
+        /**
+         * Inspect a given Texture2D to ensure that it has the correct orientation.
+         * If it is not in top-left orientation then perform the necessary correction to
+         * make it top-left
+         */
         public Texture2D CorrectRotation(Texture2D texture, string orientationString)
         {
             // tries to use the jpi.Orientation to rotate the image properly
@@ -435,7 +323,7 @@ namespace Superdoku {
                     texture = RotateTexture(texture, true);
                     texture = RotateTexture(texture, true);
                     break;
-                case "BottomLeft": // Rotate clockwise 270 degrees (I think?)...
+                case "BottomLeft": // Rotate clockwise 270 degrees
                     texture = RotateTexture(texture, true);
                     texture = RotateTexture(texture, true);
                     break;
@@ -447,8 +335,33 @@ namespace Superdoku {
         }
 
         /**
-         * Coroutine for SimpleFileBrowser to show file loading dialog. Yields so that
-         * Game waits for response
+         * Take a picture using the NativeCamera plugin.
+         * The specified max size is used as a threshold for keeping the snapped picture
+         * within the bounds of the max size
+         */
+        private void TakePicture(int maxSize)
+        {
+            NativeCamera.Permission permission = NativeCamera.TakePicture((path) =>
+            {
+                Debug.Log("Image path: " + path);
+                if (path != null)
+                {
+                    StartCoroutine(ShowLoadDialogCoroutine(path));
+                }
+            }, maxSize);
+
+            Debug.Log("Permission result: " + permission);
+        }
+
+        public void LoadImage(string path)
+        {
+            SceneManager.LoadScene(HOME_SCENE);
+            StartCoroutine(ShowLoadDialogCoroutine(path));
+        }
+
+        /**
+         * Coroutine to show file loading dialog while waiting for file to be loaded and sent
+         * to the Superdoku REST api for a response. Yields so that Game waits for response.
          */
         IEnumerator ShowLoadDialogCoroutine(string path)
         {
@@ -479,11 +392,10 @@ namespace Superdoku {
                 JpegInfo jpi = ExifReader.ReadJpeg(results, "LoadedFile");
 
                 // Determine if the provided file was a jpg or not
-                bool isJpg = jpi.IsValid;
-                Debug.Log("Loaded image is in " + (isJpg ? "JPG" : "PNG") + " format.");
+                Debug.Log("Loaded image is in " + (jpi.IsValid ? "JPG" : "PNG") + " format.");
 
                 // If it's a jpg image then we need to do some preprocessing before invoking the rest request
-                if (isJpg)
+                if (jpi.IsValid)
                 {
                     double[] Latitude = jpi.GpsLatitude;
                     double[] Longitude = jpi.GpsLongitude;

@@ -219,45 +219,5 @@ namespace Superdoku
             // Stop the webcam so it can be used again after recycling the scene associated with this instance
             webCamTexture.Stop();
         }
-
-        /**
-         * Capture the current texture frame and convert it to a png file to be
-         * written to the file system.
-         * 
-         * @see https://stackoverflow.com/questions/24496438/can-i-take-a-photo-in-unity-using-the-devices-camera
-         * @see http://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html
-         */
-        public IEnumerator TakePhoto()  // Start this Coroutine on some button click
-        {
-            // Required
-            yield return new WaitForEndOfFrame();
-
-            Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
-            photo.SetPixels(webCamTexture.GetPixels());
-            photo.Apply();
-
-            // Encode to a PNG
-            byte[] bytes = photo.EncodeToPNG();
-
-            // Write out the PNG.
-            string outputDir = Application.persistentDataPath;
-            string outFileName = "superdoku_snap.png";
-            if (GameManager.WriteFile(outputDir, outFileName, bytes, FileMode.Create))
-            {
-                // Save output file to player prefs so it can be referenced in image processor scene
-                PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, outputDir + "/" + outFileName);
-
-                if (GameManager.DEBUG_MODE)
-                {
-                    Debug.Log("Successfully wrote to " + outputDir + outFileName);
-                }
-
-                // Important so that the webcam doesn't keep running until Unity is restarted
-                webCamTexture.Stop();
-
-                // Navigate to the Image Processor scene
-                SceneManager.LoadScene(GameManager.IMAGE_PROCESSOR_SCENE);
-            }
-        }
     }
 }

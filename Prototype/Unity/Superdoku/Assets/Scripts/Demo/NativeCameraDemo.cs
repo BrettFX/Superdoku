@@ -79,45 +79,7 @@ namespace Superdoku
                 Debug.Log("Image path: " + path);
                 if (path != null)
                 {
-                    // Create a Texture2D from the captured image
-                    //Texture2D texture = NativeCamera.LoadImageAtPath(path, maxSize);
-                    // Need to load PNG with game manager implementation to prevent Unity texture not readable exception
-                    // (e.g., texture memory can't be accessed from script if using NativeCamera.LoadImageAtPath)
-                    Texture2D texture = GameManager.LoadImage(path);
-                    if (texture == null)
-                    {
-                        Debug.Log("Couldn't load texture from " + path);
-                        return;
-                    }
-
-                    // Need to rotate the picture
-                    Texture2D rotatedTexture = GameManager.RotateTexture(texture, true);
-
-                    // Encode captured image texture to png to get the byte array data
-                    byte[] data = rotatedTexture.EncodeToPNG();
-
-                    // Invoke RestRequest PUT request to recognize snapped image of Sudoku puzzle
-                    // TODO perform same preprocessing on jpg images with GameManager to ensure proper image orientation
-                    RequestContent content = new RequestContent(data, "jpg");
-                    RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", content);
-
-                    // Assign texture to a temporary quad and destroy it after 5 seconds
-                    //GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                    //quad.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 2.5f;
-                    //quad.transform.forward = Camera.main.transform.forward;
-                    //quad.transform.localScale = new Vector3(1f, texture.height / (float)texture.width, 1f);
-
-                    //Material material = quad.GetComponent<Renderer>().material;
-                    //if (!material.shader.isSupported) // happens when Standard shader is not included in the build
-                    //    material.shader = Shader.Find("Legacy Shaders/Diffuse");
-
-                    //material.mainTexture = texture;
-
-                    //Destroy(quad, 5f);
-
-                    // If a procedural texture is not destroyed manually, 
-                    // it will only be freed after a scene change
-                    //Destroy(texture, 5f);
+                    GameManager.Instance.LoadImage(path);
                 }
             }, maxSize);
 
@@ -139,5 +101,4 @@ namespace Superdoku
             Debug.Log("Permission result: " + permission);
         }
     }
-
 }
