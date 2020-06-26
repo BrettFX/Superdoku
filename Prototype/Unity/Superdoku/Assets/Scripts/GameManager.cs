@@ -1,6 +1,7 @@
 ﻿using ExifLib;
 using Kakera;
 using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -307,7 +308,7 @@ namespace Superdoku {
          * If it is not in top-left orientation then perform the necessary correction to
          * make it top-left
          */
-        public Texture2D CorrectRotation(Texture2D texture, string orientationString)
+        public static Texture2D CorrectRotation(Texture2D texture, string orientationString)
         {
             // tries to use the jpi.Orientation to rotate the image properly
             //newTexture = (Texture2D)imageHolder.texture;
@@ -346,17 +347,99 @@ namespace Superdoku {
                 Debug.Log("Image path: " + path);
                 if (path != null)
                 {
-                    StartCoroutine(ShowLoadDialogCoroutine(path));
+                    PlayerPrefs.SetString(IMAGE_PATH_KEY, path);
+                    SceneManager.LoadScene(WEB_CAM_SCENE);
+                    //StartCoroutine(ShowLoadDialogCoroutine(path));
                 }
             }, maxSize);
 
             Debug.Log("Permission result: " + permission);
         }
 
-        public void LoadImage(string path)
+        /**
+         * Simple file loading utility to load an image at a given path to a Texture2D object 
+         */
+        public static byte[] GetImageData(string filePath)
         {
-            SceneManager.LoadScene(HOME_SCENE);
-            StartCoroutine(ShowLoadDialogCoroutine(path));
+            byte[] fileData = null;
+
+            if (File.Exists(filePath))
+            {
+                fileData = File.ReadAllBytes(filePath);
+            }
+
+            return fileData;
+        }
+
+        /**
+         * Process provided texture data to be in a state suitable for image processing
+         * to be sent to the Superdoku REST api. One of the core steps of this function
+         * is to handle the case when the orientation of a jpeg image is not in portrait. This
+         * function handles reading the respective jpeg image's Exchange Image File (EXIF) data
+         * to determine the proper course of action based on the state of the orientation key.
+         */
+        public static RequestContent ProcessAndBuildRequest(byte[] textureData)
+        {
+            Texture2D tex = new Texture2D(2, 2, TextureFormat.BGRA32, false);
+            tex.LoadImage(textureData);
+
+            // Build a request content object
+            RequestContent requestContent = new RequestContent();
+
+            Debug.Log("Image Size (in bytes): " + textureData.Length.ToString());
+            JpegInfo jpi = ExifReader.ReadJpeg(textureData, "LoadedFile");
+
+            // Determine if the provided file was a jpg or not
+            Debug.Log("Loaded image is in " + (jpi.IsValid ? "JPG" : "PNG") + " format.");
+
+            // If it's a jpg image then we need to do some preprocessing before invoking the rest request
+            if (jpi.IsValid)
+            {
+                double[] Latitude = jpi.GpsLatitude;
+                double[] Longitude = jpi.GpsLongitude;
+                string orientationString = jpi.Orientation.ToString();
+
+                string exifDataStr = "<b>Exif Data:</b>" + "<color=white>";
+                exifDataStr = exifDataStr + "\n" + "FileName: " + jpi.FileName;
+                exifDataStr = exifDataStr + "\n" + "DateTime: " + jpi.DateTime;
+                exifDataStr = exifDataStr + "\n" + "GpsLatitude: " + Latitude[0] + "° " + Latitude[1] + "' " + Latitude[2] + '"';
+                exifDataStr = exifDataStr + "\n" + "GpsLongitude: " + Longitude[0] + "° " + Longitude[1] + "' " + Longitude[2] + '"';
+                exifDataStr = exifDataStr + "\n" + "Description: " + jpi.Description;
+                exifDataStr = exifDataStr + "\n" + "Height: " + jpi.Height + " pixels";
+                exifDataStr = exifDataStr + "\n" + "Width: " + jpi.Width + " pixels";
+                exifDataStr = exifDataStr + "\n" + "ResolutionUnit: " + jpi.ResolutionUnit;
+                exifDataStr = exifDataStr + "\n" + "UserComment: " + jpi.UserComment;
+                exifDataStr = exifDataStr + "\n" + "Make: " + jpi.Make;
+                exifDataStr = exifDataStr + "\n" + "Model: " + jpi.Model;
+                exifDataStr = exifDataStr + "\n" + "Software: " + jpi.Software;
+                exifDataStr = exifDataStr + "\n" + "Orientation: " + orientationString;
+                exifDataStr = exifDataStr + "</color>";
+
+                Debug.Log(exifDataStr);
+
+                // Assure the corrent orientation of the provided jpg image
+                tex = CorrectRotation(tex, jpi.Orientation.ToString());
+                requestContent.data = tex.EncodeToJPG();
+                requestContent.filetype = "jpg";
+            }
+            else
+            {
+                // Otherwise the image isn't a jpg and we can process it normally
+                requestContent.data = tex.EncodeToPNG();
+                requestContent.filetype = "png";
+            }
+
+            return requestContent;
+        }
+
+        /**
+         * Call the respective REST endpoint for recognizing the provided data within the RequestContent
+         * instance.
+         */
+        public static void SendTexture(RequestContent requestContent)
+        {
+            // Send the file data to the superdoku api to recognize and classifiy its digits
+            RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", requestContent);
         }
 
         /**
@@ -365,75 +448,84 @@ namespace Superdoku {
          */
         IEnumerator ShowLoadDialogCoroutine(string path)
         {
-            // Start loading modal. 
-            // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
-            loadingModal.SetActive(true);
-
             Debug.Log("Processing file: " + path);
 
-            UnityWebRequest www = UnityWebRequest.Get("file://" + path);
-            yield return www.SendWebRequest();
+            yield return new WaitForEndOfFrame();
 
-            if (www.isNetworkError || www.isHttpError)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                // retrieve results as binary data
-                byte[] results = www.downloadHandler.data;
-                Texture2D tex = new Texture2D(2, 2);
-                tex.LoadImage(results);
+            PlayerPrefs.SetString(IMAGE_PATH_KEY, path);
+            SceneManager.LoadScene(WEB_CAM_SCENE);
 
-                // Build a request content object
-                RequestContent requestContent = new RequestContent();
+            // Start loading modal. 
+            // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
+            //loadingModal.SetActive(true);
 
-                Debug.Log("Finished Getting Image -> SIZE: " + results.Length.ToString());
-                JpegInfo jpi = ExifReader.ReadJpeg(results, "LoadedFile");
+            //Debug.Log("Processing file: " + path);
 
-                // Determine if the provided file was a jpg or not
-                Debug.Log("Loaded image is in " + (jpi.IsValid ? "JPG" : "PNG") + " format.");
+            //UnityWebRequest www = UnityWebRequest.Get("file://" + path);
+            //yield return www.SendWebRequest();
 
-                // If it's a jpg image then we need to do some preprocessing before invoking the rest request
-                if (jpi.IsValid)
-                {
-                    double[] Latitude = jpi.GpsLatitude;
-                    double[] Longitude = jpi.GpsLongitude;
-                    string orientationString = jpi.Orientation.ToString();
+            //if (www.isNetworkError || www.isHttpError)
+            //{
+            //    Debug.Log(www.error);
+            //}
+            //else
+            //{
+            //    // retrieve results as binary data
+            //    byte[] results = www.downloadHandler.data;
+            //    ProcessAndSendTexture(results);
 
-                    string exifDataStr = "<b>Exif Data:</b>" + "<color=white>";
-                    exifDataStr = exifDataStr + "\n" + "FileName: " + jpi.FileName;
-                    exifDataStr = exifDataStr + "\n" + "DateTime: " + jpi.DateTime;
-                    exifDataStr = exifDataStr + "\n" + "GpsLatitude: " + Latitude[0] + "° " + Latitude[1] + "' " + Latitude[2] + '"';
-                    exifDataStr = exifDataStr + "\n" + "GpsLongitude: " + Longitude[0] + "° " + Longitude[1] + "' " + Longitude[2] + '"';
-                    exifDataStr = exifDataStr + "\n" + "Description: " + jpi.Description;
-                    exifDataStr = exifDataStr + "\n" + "Height: " + jpi.Height + " pixels";
-                    exifDataStr = exifDataStr + "\n" + "Width: " + jpi.Width + " pixels";
-                    exifDataStr = exifDataStr + "\n" + "ResolutionUnit: " + jpi.ResolutionUnit;
-                    exifDataStr = exifDataStr + "\n" + "UserComment: " + jpi.UserComment;
-                    exifDataStr = exifDataStr + "\n" + "Make: " + jpi.Make;
-                    exifDataStr = exifDataStr + "\n" + "Model: " + jpi.Model;
-                    exifDataStr = exifDataStr + "\n" + "Software: " + jpi.Software;
-                    exifDataStr = exifDataStr + "\n" + "Orientation: " + orientationString;
-                    exifDataStr = exifDataStr + "</color>";
+            //    //Texture2D tex = new Texture2D(2, 2);
+            //    //tex.LoadImage(results);
 
-                    Debug.Log(exifDataStr);
+            //    //// Build a request content object
+            //    //RequestContent requestContent = new RequestContent();
 
-                    // Assure the corrent orientation of the provided jpg image
-                    tex = CorrectRotation(tex, jpi.Orientation.ToString());
-                    requestContent.data = tex.EncodeToJPG();
-                    requestContent.filetype = "jpg";
-                }
-                else
-                {
-                    // Otherwise the image isn't a jpg and we can process it normally
-                    requestContent.data = tex.EncodeToPNG();
-                    requestContent.filetype = "png";
-                }
+            //    //Debug.Log("Finished Getting Image -> SIZE: " + results.Length.ToString());
+            //    //JpegInfo jpi = ExifReader.ReadJpeg(results, "LoadedFile");
 
-                // Send the file data to the superdoku api to recognize and classifiy its digits
-                RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", requestContent);
-            }
+            //    //// Determine if the provided file was a jpg or not
+            //    //Debug.Log("Loaded image is in " + (jpi.IsValid ? "JPG" : "PNG") + " format.");
+
+            //    //// If it's a jpg image then we need to do some preprocessing before invoking the rest request
+            //    //if (jpi.IsValid)
+            //    //{
+            //    //    double[] Latitude = jpi.GpsLatitude;
+            //    //    double[] Longitude = jpi.GpsLongitude;
+            //    //    string orientationString = jpi.Orientation.ToString();
+
+            //    //    string exifDataStr = "<b>Exif Data:</b>" + "<color=white>";
+            //    //    exifDataStr = exifDataStr + "\n" + "FileName: " + jpi.FileName;
+            //    //    exifDataStr = exifDataStr + "\n" + "DateTime: " + jpi.DateTime;
+            //    //    exifDataStr = exifDataStr + "\n" + "GpsLatitude: " + Latitude[0] + "° " + Latitude[1] + "' " + Latitude[2] + '"';
+            //    //    exifDataStr = exifDataStr + "\n" + "GpsLongitude: " + Longitude[0] + "° " + Longitude[1] + "' " + Longitude[2] + '"';
+            //    //    exifDataStr = exifDataStr + "\n" + "Description: " + jpi.Description;
+            //    //    exifDataStr = exifDataStr + "\n" + "Height: " + jpi.Height + " pixels";
+            //    //    exifDataStr = exifDataStr + "\n" + "Width: " + jpi.Width + " pixels";
+            //    //    exifDataStr = exifDataStr + "\n" + "ResolutionUnit: " + jpi.ResolutionUnit;
+            //    //    exifDataStr = exifDataStr + "\n" + "UserComment: " + jpi.UserComment;
+            //    //    exifDataStr = exifDataStr + "\n" + "Make: " + jpi.Make;
+            //    //    exifDataStr = exifDataStr + "\n" + "Model: " + jpi.Model;
+            //    //    exifDataStr = exifDataStr + "\n" + "Software: " + jpi.Software;
+            //    //    exifDataStr = exifDataStr + "\n" + "Orientation: " + orientationString;
+            //    //    exifDataStr = exifDataStr + "</color>";
+
+            //    //    Debug.Log(exifDataStr);
+
+            //    //    // Assure the corrent orientation of the provided jpg image
+            //    //    tex = CorrectRotation(tex, jpi.Orientation.ToString());
+            //    //    requestContent.data = tex.EncodeToJPG();
+            //    //    requestContent.filetype = "jpg";
+            //    //}
+            //    //else
+            //    //{
+            //    //    // Otherwise the image isn't a jpg and we can process it normally
+            //    //    requestContent.data = tex.EncodeToPNG();
+            //    //    requestContent.filetype = "png";
+            //    //}
+
+            //    //// Send the file data to the superdoku api to recognize and classifiy its digits
+            //    //RestRequest.Instance.SendRequest(string.Format(RestRequest.BASE_URL, "recognize"), "PUT", requestContent);
+            //}
         }
     }
 }

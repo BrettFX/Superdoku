@@ -79,7 +79,8 @@ namespace Superdoku
                 Debug.Log("Image path: " + path);
                 if (path != null)
                 {
-                    GameManager.Instance.LoadImage(path);
+                    PlayerPrefs.SetString(GameManager.IMAGE_PATH_KEY, path);
+                    SceneManager.LoadScene(GameManager.WEB_CAM_SCENE);
                 }
             }, maxSize);
 
