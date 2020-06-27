@@ -4,7 +4,6 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -20,7 +19,7 @@ namespace Superdoku {
 
         public const bool DEBUG_MODE = true;
         public const int HOME_SCENE = 0;
-        public const int WEB_CAM_SCENE = 1;
+        public const int IMAGE_PROCESSOR_SCENE = 1;
         public const string IMAGE_PATH_KEY = "CurrentImagePath";
 
         [Header("Cell Management")]
@@ -350,7 +349,7 @@ namespace Superdoku {
                 if (path != null)
                 {
                     PlayerPrefs.SetString(IMAGE_PATH_KEY, path);
-                    SceneManager.LoadScene(WEB_CAM_SCENE);
+                    SceneManager.LoadScene(IMAGE_PROCESSOR_SCENE);
                     //StartCoroutine(ShowLoadDialogCoroutine(path));
                 }
             }, maxSize);
@@ -456,7 +455,7 @@ namespace Superdoku {
             yield return new WaitForEndOfFrame();
 
             PlayerPrefs.SetString(IMAGE_PATH_KEY, path);
-            SceneManager.LoadScene(WEB_CAM_SCENE);
+            SceneManager.LoadScene(IMAGE_PROCESSOR_SCENE);
 
             // Start loading modal. 
             // This modal will be reset by the Unity scene recycler once the main scene is reloaded by the RestRequest
