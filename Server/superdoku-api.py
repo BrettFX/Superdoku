@@ -9,6 +9,7 @@ from flask import request, jsonify
 import datetime
 import os
 import re
+import tempfile
 import SudokuExtractor
 
 API_BASE_URL = "/superdoku-api"
@@ -71,8 +72,8 @@ def recognize():
     result = pattern.search(request.headers["Content-Disposition"])
     file_type = result.group(1)
 
-    # Create file path with file timestamp appended and dynamically set file extension based on file type
-    file_path = '/tmp/superdoku-snap_{}.{}'.format(file_timestamp, "jpg" if "jpg" in file_type.lower() else "png")
+    # Create file path with file timestamp appended and dynamically set file extension based on file type (saves to temp directory)
+    file_path = '{}/superdoku-snap_{}.{}'.format(tempfile.gettempdir(), file_timestamp, "jpg" if "jpg" in file_type.lower() else "png")
 
     # Ensure multipart form-data is being used
     if 'application/octet-stream' in request.headers['Content-Type']:
