@@ -342,6 +342,8 @@ namespace Superdoku {
          */
         private void TakePicture(int maxSize)
         {
+            // Temporarilty show loading modal before transitioning to scanning
+            loadingModal.SetActive(true);
             NativeCamera.Permission permission = NativeCamera.TakePicture((path) =>
             {
                 Debug.Log("Image path: " + path);
@@ -449,6 +451,7 @@ namespace Superdoku {
         IEnumerator ShowLoadDialogCoroutine(string path)
         {
             Debug.Log("Processing file: " + path);
+            loadingModal.SetActive(true);
 
             yield return new WaitForEndOfFrame();
 

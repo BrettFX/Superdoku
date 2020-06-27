@@ -27,6 +27,11 @@ public static class TaskExtensions
 
 public static class CanvasExtensions
 {
+    /**
+     * A Canvas extension to be applied to RawImage components to ensure that the
+     * texture associated with the respective RawImage is scaled appropriately to conform
+     * to the size of its parent.
+     */
     public static Vector2 SizeToParent(this RawImage image, float padding = 0)
     {
         var parent = image.transform.parent.GetComponentInParent<RectTransform>();
@@ -91,6 +96,7 @@ namespace Superdoku
 
             // TEST
             //GetComponent<RawImage>().SizeToParent();
+            //ToggleAnimation(true);
 
             // Load image path from player prefs
             string imagePath = PlayerPrefs.GetString(GameManager.IMAGE_PATH_KEY);
