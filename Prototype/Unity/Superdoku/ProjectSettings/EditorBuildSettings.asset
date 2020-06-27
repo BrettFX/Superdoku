@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/HomeScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/WebCamScene.unity
+    path: Assets/Scenes/ImageProcessorScene.unity
     guid: be7118b14746dfc4bbd2f5c962be1b95
   m_configObjects: {}
