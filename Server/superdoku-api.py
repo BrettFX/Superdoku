@@ -13,6 +13,7 @@ import tempfile
 import SudokuExtractor
 
 API_BASE_URL = "/superdoku-api"
+PID_FILE = "superdoku.pid"
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -102,6 +103,11 @@ def recognize():
 def page_not_found(e):
     """Handle invalid REST endpoint request URLs that cannot be found."""
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
+
+# Write process id (pid) to associated pid file so the server can be stopped externally
+pid = str(os.getpid())
+with open(PID_FILE, "w") as pid_file:
+    pid_file.write(pid)
 
 # Run the flask app to begin listening on port 5000 (allow all TCP traffic)
 app.run(host='0.0.0.0', port=5000, threaded=False)
