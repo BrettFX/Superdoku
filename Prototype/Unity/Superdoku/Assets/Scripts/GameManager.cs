@@ -79,12 +79,20 @@ namespace Superdoku {
             if (requestError != null && requestError != "")
             {
                 // Display appropriate error modal
-                errorMsgText.text = requestError;
-                errorModal.SetActive(true);
+                DisplayError(requestError);
 
                 // Remove RestRequestError key from player prefs
                 PlayerPrefs.DeleteKey("RestRequestError");
             }
+        }
+
+        /**
+         * Display an error message using the error modal
+         */
+        public void DisplayError(string msg)
+        {
+            errorMsgText.text = msg;
+            errorModal.SetActive(true);
         }
 
         /**
@@ -203,6 +211,15 @@ namespace Superdoku {
             // Deselect current active cell
             m_currentActiveCell = null;
             cameraModal.SetActive(false);
+
+            // Display appropriate error if the device doesn't have network connectivity
+            if (IsNetworkDisconnected())
+            {
+                DisplayError("Network is disconnected. This feature requires network connectivity." +
+                    " Please connect to the Internet.");
+                return;
+            }
+
             if (DEBUG_MODE) { Debug.Log("Launching camera scene..."); }
 
             // Change to web cam scene
@@ -222,6 +239,15 @@ namespace Superdoku {
             // Deselect current active cell
             m_currentActiveCell = null;
             cameraModal.SetActive(false);
+
+            // Display appropriate error if the device doesn't have network connectivity
+            if (IsNetworkDisconnected())
+            {
+                DisplayError("Network is disconnected. This feature requires network connectivity." +
+                    " Please connect to the Internet.");
+                return;
+            }
+
             if (DEBUG_MODE) { Debug.Log("Launching gallery scene..."); }
 
             // Open image picker (using Unimgpicker)
@@ -271,6 +297,11 @@ namespace Superdoku {
 
             // Commit the button color change
             button.colors = colors;
+        }
+
+        public static bool IsNetworkDisconnected()
+        {
+            return Application.internetReachability == NetworkReachability.NotReachable;
         }
 
         /**
