@@ -3,6 +3,7 @@ Description=Superdoku
 After=syslog.target network.target
 
 [Service]
+WorkingDirectory=/opt/superdoku/bin
 Type=forking
 
 User=root
