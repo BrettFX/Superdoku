@@ -11,9 +11,15 @@ function CheckServerStatus()
 {
     # Check if the server is already running
     local pid=$(head -1 $pid_file)
-    echo "Checking pid: $pid"
-    server_status=$(/bin/ps -p $pid -o command | /bin/grep superdoku-api.py)
-    server_status=$(echo $?)
+
+    # Make sure there was a pid
+    if [[ -z $pid ]]; then
+        server_status="1"
+    else
+        echo "Checking pid: $pid"
+        server_status=$(/bin/ps -p $pid -o command | /bin/grep superdoku-api.py)
+        server_status=$(echo $?)
+    fi
 
     # Server is already running if the result is 0
     if [[ $server_status == "0" ]]; then
