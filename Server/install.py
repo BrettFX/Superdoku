@@ -1,5 +1,6 @@
 import platform
 import os
+import stat
 import sys
 import subprocess
 from shutil import copyfile
@@ -45,6 +46,9 @@ def main():
     pid_file = "{}/superdoku.pid".format(bin_dir)
     if not os.path.exists(pid_file):
         os.mknod(pid_file)
+
+    # Change permissions on superdoku.sh for execute
+    os.chmod("{}/superdoku.sh".format(bin_dir), stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
     # Copy the service file to the respective systemd directory if Linux
     if target_os == "Linux":
