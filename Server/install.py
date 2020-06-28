@@ -61,6 +61,7 @@ def main():
         subprocess.check_call(["systemctl", "status", "superdoku"])
     elif target_os == "Windows":
         print("Service support for Windows not yet implemented.")
+        print("Please execute the superdoku.sh script manually with: sh superdoku.sh [start|stop]")
 
 if __name__ == "__main__":
     main()
