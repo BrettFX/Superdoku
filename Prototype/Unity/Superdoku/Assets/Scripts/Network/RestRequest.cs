@@ -42,6 +42,7 @@ namespace Superdoku
 
         public GameObject testImage;
         public const string BASE_URL = "http://192.168.0.238:5000/superdoku-api/{0}";
+        public const int TIMEOUT = 10; // in seconds
 
         /**
          * Ensure this class remains a singleton instance
@@ -128,6 +129,7 @@ namespace Superdoku
             UnityWebRequest request = UnityWebRequest.Put(url, content.data);
             request.SetRequestHeader("Content-Type", "application/octet-stream");
             request.SetRequestHeader("Content-Disposition", "attachment; filetype=\"" + content.filetype + "\"");
+            request.timeout = TIMEOUT;
             yield return request.SendWebRequest();
 
             if (request.isNetworkError || request.isHttpError)
