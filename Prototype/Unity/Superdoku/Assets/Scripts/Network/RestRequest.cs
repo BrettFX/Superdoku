@@ -42,7 +42,7 @@ namespace Superdoku
 
         public GameObject testImage;
         public const string BASE_URL = "http://192.168.0.238:5000/superdoku-api/{0}";
-        public const int TIMEOUT = 10; // in seconds
+        public const int TIMEOUT = 60; // in seconds
 
         /**
          * Ensure this class remains a singleton instance

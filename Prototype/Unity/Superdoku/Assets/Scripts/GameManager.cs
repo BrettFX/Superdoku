@@ -74,6 +74,9 @@ namespace Superdoku {
 
         void Start()
         {
+            // Turn off loading modal if it's active
+            ToggleLoadingModal(false);
+
             // Handle case when rest request error occurred
             string requestError = PlayerPrefs.GetString("RestRequestError");
             if (requestError != null && requestError != "")
@@ -388,7 +391,7 @@ namespace Superdoku {
                     //StartCoroutine(ShowLoadDialogCoroutine(path));
                 }
             }, maxSize);
-
+            
             Debug.Log("Permission result: " + permission);
         }
 
