@@ -379,13 +379,14 @@ namespace Superdoku {
          */
         private void TakePicture(int maxSize)
         {
-            // Temporarilty show loading modal before transitioning to scanning
-            ToggleLoadingModal(true);
             NativeCamera.Permission permission = NativeCamera.TakePicture((path) =>
             {
                 Debug.Log("Image path: " + path);
                 if (path != null)
                 {
+                    // Temporarilty show loading modal before transitioning to scanning
+                    ToggleLoadingModal(true);
+
                     PlayerPrefs.SetString(IMAGE_PATH_KEY, path);
                     SceneManager.LoadScene(IMAGE_PROCESSOR_SCENE);
                     //StartCoroutine(ShowLoadDialogCoroutine(path));
