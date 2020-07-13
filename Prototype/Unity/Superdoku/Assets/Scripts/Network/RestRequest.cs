@@ -41,7 +41,7 @@ namespace Superdoku
         }
 
         public GameObject testImage;
-        public const string BASE_URL = "http://192.168.0.238:8080/SuperdokuAPI/{0}";
+        public const string BASE_URL = "http://192.168.0.238:8080/SuperdokuAPI/rest/{0}";
         public const int TIMEOUT = 60; // in seconds
 
         /**
