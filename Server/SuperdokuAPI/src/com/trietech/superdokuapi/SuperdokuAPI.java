@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,60 +72,70 @@ public class SuperdokuAPI {
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Produces(MediaType.APPLICATION_JSON)	
 	public Response recognize(byte[] imagePayload, @HeaderParam("Content-Disposition") String contentDisposition) {
+		// Create a status report object to contain the main response in addition to any errors
+		HashMap<String, Object> statusReport = new HashMap<>();	
+		
 		LOGGER.info("Processing image recognition request...");
 		LOGGER.info("|-- data length: " + imagePayload.length);
 		
-		// Create file timestamp
-		Date date = new Date(System.currentTimeMillis());  
-	    Timestamp ts=new Timestamp(date.getTime());
-	    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmm_ss_SSS");  
-		String fileTimestamp = formatter.format(ts);
-		
-		// Get file type from content disposition in request header (treat as jpg by default)
-		Pattern pattern = Pattern.compile("(?<=filetype=\").*?(?=\")");
-		Matcher fileTypeMatcher = pattern.matcher(contentDisposition);
-		String fileType = fileTypeMatcher.find() ? 
-										 contentDisposition.substring(fileTypeMatcher.start(), fileTypeMatcher.end())
-										 : "jpg";
-		
-		LOGGER.info("File type: " + fileType);
+		if (imagePayload.length > 0 ) {
+			// Create file timestamp
+			Date date = new Date(System.currentTimeMillis());  
+		    Timestamp ts=new Timestamp(date.getTime());
+		    SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmm_ss_SSS");  
+			String fileTimestamp = formatter.format(ts);
+			
+			// Get file type from content disposition in request header (treat as jpg by default)
+			Pattern pattern = Pattern.compile("(?<=filetype=\").*?(?=\")");
+			Matcher fileTypeMatcher = pattern.matcher(contentDisposition);
+			String fileType = fileTypeMatcher.find() ? 
+											 contentDisposition.substring(fileTypeMatcher.start(), fileTypeMatcher.end())
+											 : "jpg";
+			
+			LOGGER.info("File type: " + fileType);
 
-		String basename = "superdoku-snap_" + fileTimestamp;
-		String uploadFileLocation = TEMP_DIR + "/" + basename + "." + fileType;
+			String basename = "superdoku-snap_" + fileTimestamp;
+			String uploadFileLocation = TEMP_DIR + "/" + basename + "." + fileType;
 
-	    // Save the uploaded image file
-	    writeToFile(imagePayload, uploadFileLocation);
-	    
-	    // Invoke Python process to recognize sudoku image and parse grid
-	    parseGrid(uploadFileLocation);
-	    
-	    // Read array from output file
-	    String csvLine = "";
-	    final String outpath = SUPERDOKU_CORE_DIR + "/" + basename + ".out";
-	    File outfile = new File(outpath);
-		try {
-			csvLine = head(outfile, 1);
-		} catch (IOException e) {
-			LOGGER.error("IOException:", e);
+		    // Save the uploaded image file
+		    writeToFile(imagePayload, uploadFileLocation);
+		    
+		    // Invoke Python process to recognize sudoku image and parse grid
+		    parseGrid(uploadFileLocation);
+		    
+		    // Read array from output file
+		    String csvLine = "";
+		    final String outpath = SUPERDOKU_CORE_DIR + "/" + basename + ".out";
+		    File outfile = new File(outpath);
+			try {
+				csvLine = head(outfile, 1);
+			} catch (IOException e) {
+				LOGGER.error("IOException:", e);
+			}
+			
+		    LOGGER.info("Read line from file: " + csvLine);
+		    
+		    // Tokenize the puzzle string to a string array and then parse to an integer array
+		    String[] tokens = csvLine.trim().split(","); // Be sure to trim to get rid of newline characters
+		    int[] puzzle = Arrays.asList(tokens).stream().mapToInt(Integer::parseInt).toArray();
+		    
+		    // Put the parsed puzzle in the status report for processing on client side
+		    statusReport.put("puzzle", puzzle);
+		    
+		    // Remove the snapped image
+		    boolean deleted = FileUtils.deleteQuietly(new File(uploadFileLocation));
+		    LOGGER.info(deleted ? "Deleted " + uploadFileLocation : "Could not delete " + uploadFileLocation);
+		    
+		    // Delete temporary snap outfile as well
+		    deleted = FileUtils.deleteQuietly(outfile);
+		    LOGGER.info(deleted ? "Deleted " + outpath : "Could not delete " + outpath);
+		} else {
+			statusReport.put("error", "Could not get request data to write file with.");
 		}
-		
-	    LOGGER.info("Read line from file: " + csvLine);
-	    
-	    // Tokenize the puzzle string to a string array and then parse to an integer array
-	    String[] tokens = csvLine.trim().split(","); // Be sure to trim to get rid of newline characters
-	    int[] puzzle = Arrays.asList(tokens).stream().mapToInt(Integer::parseInt).toArray();
-	    
-	    // Remove the snapped image
-	    boolean deleted = FileUtils.deleteQuietly(new File(uploadFileLocation));
-	    LOGGER.info(deleted ? "Deleted " + uploadFileLocation : "Could not delete " + uploadFileLocation);
-	    
-	    // Delete temporary snap outfile as well
-	    deleted = FileUtils.deleteQuietly(outfile);
-	    LOGGER.info(deleted ? "Deleted " + outpath : "Could not delete " + outpath);
 		
 		// Return the test Sudoku puzzle for now		
 		return Response.ok()
-				.entity(puzzle)
+				.entity(statusReport)
 				.build();
 	}
 	
