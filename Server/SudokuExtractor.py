@@ -529,6 +529,17 @@ def autocrop(image, threshold=0):
 
     return image
 
+def write_digits_to_file(classified_digits, outfile_name):
+    """
+    Write an array of classified digits to a text file for the purpose of post-processing as needed.
+
+    Parameters:
+        classified_digits (array): the array of classified digits to iterate and write to a file
+    """
+    with open(outfile_name, "w") as f:
+        csv_string = ",".join(str(digit) for digit in classified_digits)
+        f.write(csv_string)
+    
 
 def parse_grid(path):
     """
@@ -540,6 +551,7 @@ def parse_grid(path):
     Returns:
         the integer array of classified digits in result of parsing the Sudoku image.
     """
+    print("Parsing grid from {}".format(path))
     original = cv2.imread(path, cv2.IMREAD_COLOR)              # Read in the input file with color
     show_image(original, title='Original')
     resized = image_resize(original, height=600)               # Resize the image as needed (e.g., 600x600)
@@ -560,6 +572,10 @@ def parse_grid(path):
     classified_digits = get_classified_digits(digits, stage_output=False)
     
     print_sudoku_puzzle(classified_digits)                     # Print the parsed Sudoku puzzle (unsolved)
+
+    # Write to outfile for post-processing as needed
+    outfile = os.path.splitext(os.path.basename(path))[0] + ".out"
+    write_digits_to_file(classified_digits, outfile)
 
     # Return parsed classified digits
     return classified_digits
