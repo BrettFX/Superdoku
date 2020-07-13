@@ -1,0 +1,16 @@
+[Unit]
+Description=Superdoku
+After=syslog.target network.target
+
+[Service]
+WorkingDirectory=/opt/superdoku/bin
+Type=forking
+
+User=root
+Group=root
+
+ExecStart=/opt/superdoku/bin/superdoku.sh start
+ExecStop=/opt/superdoku/bin/superdoku.sh stop
+
+[Install]
+WantedBy=multi-user.target
