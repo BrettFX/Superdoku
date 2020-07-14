@@ -573,9 +573,10 @@ def parse_grid(path):
     
     print_sudoku_puzzle(classified_digits)                     # Print the parsed Sudoku puzzle (unsolved)
 
-    # Write to outfile for post-processing as needed
-    outfile = os.path.splitext(os.path.basename(path))[0] + ".out"
-    write_digits_to_file(classified_digits, outfile)
+    # Write to outfile for post-processing as needed (only if running for module use and not from main)
+    if __name__ != "__main__":
+        outfile = os.path.splitext(os.path.basename(path))[0] + ".out"
+        write_digits_to_file(classified_digits, outfile)
 
     # Return parsed classified digits
     return classified_digits
@@ -589,5 +590,5 @@ def main():
         source_path = args[1]
         parse_grid(source_path)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

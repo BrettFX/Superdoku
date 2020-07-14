@@ -1,9 +1,22 @@
 import platform
+import sys
+
+target_os = platform.system()
+
+if target_os != "Linux":
+    print("Target deployment operating system must be Linux.")
+    print("Detected operating system is {}".format(target_os))
+    print("Aborting installation procedure.")
+    sys.exit(1)    
+
 import os
 import stat
-import sys
 import subprocess
 from shutil import copyfile
+
+# Built-in modules only available on Linux/Unix operating systems
+import pwd
+import grp
 
 def install_modules():
     """
@@ -12,56 +25,48 @@ def install_modules():
     """
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
+def chown(path, user, group, recurse=False):
+    # Get the integer representation of the user and group strings
+    uid = pwd.getpwnam(user).pw_uid
+    gid = grp.getgrnam(group).gr_gid
+
+    if recurse:
+        # Traverse base directory to set owner and group to tomcat for root directory and all nested files
+        for root, dirs, files in os.walk(path):
+            os.chown(root, uid, gid)
+            for d in dirs:
+                os.chown("{}/{}".format(root, d), uid, gid)
+            for f in files:
+                os.chown("{}/{}".format(root, f), uid, gid)
+    else:
+        # Otherwise, only change the ownership of the top-level directory or file
+        os.chown(path, uid, gid)
+
 def main():
-    target_os = platform.system()
-    print("Installing Superdoku API for {}".format(target_os))
+    print("Installing Superdoku API...")
 
     # Install required python modules
     install_modules()
 
     # Create base installation directory based on platform
-    base_dir = os.path.expanduser("~/")
-    if target_os == "Linux":
-        base_dir = "/opt/"
-
-    base_dir = base_dir + "superdoku"
-    bin_dir = base_dir + "/bin"
-
+    base_dir = "/opt/Superdoku"
     print("Migrating server files to {}".format(base_dir))
 
     # Create the directories as needed
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
 
-    if not os.path.exists(bin_dir):
-        os.makedirs(bin_dir)
+    # Copy resources to base directory
+    copyfile("SudokuExtractor.py", "{}/SudokuExtractor.py".format(base_dir))
+    copyfile("digit_classifier_cnn.h5", "{}/digit_classifier_cnn.h5".format(base_dir))
+    copyfile("run_extractor.sh", "{}/run_extractor.sh".format(base_dir))
+    copyfile("SuperdokuAPI/log4j.xml", "{}/log4j.xml".format(base_dir))
 
-    # Copy executables to the bin folder
-    copyfile("superdoku.sh", "{}/superdoku.sh".format(bin_dir))
-    copyfile("superdoku-api.py", "{}/superdoku-api.py".format(bin_dir))
-    copyfile("SudokuExtractor.py", "{}/SudokuExtractor.py".format(bin_dir))
-    copyfile("digit_classifier_cnn.h5", "{}/digit_classifier_cnn.h5".format(bin_dir))
+    # Change owner of base_dir to tomcat
+    chown(path=base_dir, user="tomcat", group="tomcat", recurse=True)
 
-    # Don't copy this file because it might not exist yet
-    pid_file = "{}/superdoku.pid".format(bin_dir)
-    if not os.path.exists(pid_file):
-        os.mknod(pid_file)
-
-    # Change permissions on superdoku.sh for execute
-    os.chmod("{}/superdoku.sh".format(bin_dir), stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-
-    # Copy the service file to the respective systemd directory if Linux
-    if target_os == "Linux":
-        copyfile("superdoku.service", "/etc/systemd/system/superdoku.service")
-
-        # Reload systemd config and start the superdoku service (set the superdoku server to start a system boot)
-        subprocess.check_call(["systemctl", "daemon-reload"])
-        subprocess.check_call(["systemctl", "enable", "superdoku.service"])
-        subprocess.check_call(["systemctl", "start", "superdoku"])
-        subprocess.check_call(["systemctl", "status", "superdoku"])
-    elif target_os == "Windows":
-        print("Service support for Windows not yet implemented.")
-        print("Please execute the superdoku.sh script manually with: sh superdoku.sh [start|stop]")
+    print("Installation complete.")
+    print("Please deploy the associated SuperdokuAPI WAR artifact to Apache Tomcat server.")
 
 if __name__ == "__main__":
     main()
