@@ -1,13 +1,23 @@
+"""
+Installer script for the Sudoku API.
+
+Filename: install.py
+Author: Brett Allen
+Description: 
+    Migrates all associated files to the /opt/Superdoku folder on a Linux machine.
+    Expects that the Superdoku API WAR artifact can be deployed to Apache Tomcat as a manual
+    post processing step.
+"""
 import platform
 import sys
 
+# Before going any further, assert that the operating system is Linux
 target_os = platform.system()
-
 if target_os != "Linux":
     print("Target deployment operating system must be Linux.")
     print("Detected operating system is {}".format(target_os))
     print("Aborting installation procedure.")
-    sys.exit(1)    
+    sys.exit(1)
 
 import os
 import stat
@@ -20,12 +30,27 @@ import grp
 
 def install_modules():
     """
-    Install the set of PIP modules contained within the requirements.txt file
+    Install the set of PIP modules contained within the requirements.txt file.
+
     Skips over any modules that have already been installed.
     """
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
 def chown(path, user, group, recurse=False):
+    """
+    Change ownership of a given file or directory (path).
+
+    Adds the ability to recursively set the user and group ownership of a directory
+    and its nested files and directories.
+
+    Parameters:
+        path (string): the path to a file or directory
+        user (string): the user to set the ownership to
+        group (string): the group to set the ownership to
+        recurse (boolean): flag to determine if the nested files or directories of a given directory should
+                           also inherit the user and group ownership (otherwise only the top level file or
+                           directory will be effected).
+    """
     # Get the integer representation of the user and group strings
     uid = pwd.getpwnam(user).pw_uid
     gid = grp.getgrnam(group).gr_gid
@@ -43,6 +68,7 @@ def chown(path, user, group, recurse=False):
         os.chown(path, uid, gid)
 
 def main():
+    """Invoke the installation procedure as mainline program (not as a module)."""
     print("Installing Superdoku API...")
 
     # Install required python modules
