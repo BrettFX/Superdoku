@@ -1,13 +1,21 @@
 ﻿using ExifLib;
 using Kakera;
+using System;
 using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Superdoku {
+    //public interface SolverCallback
+    //{
+    //    void onSuccess();
+    //    void onFail();
+    //}
+
     public class GameManager: MonoBehaviour {
         // Static Refs //
         private static GameManager instance;
@@ -42,6 +50,7 @@ namespace Superdoku {
         public Text errorMsgText;
 
         private bool m_solved = false;
+        private Action m_actions;
 
         private static GameObject m_currentActiveCell;
 
@@ -76,6 +85,9 @@ namespace Superdoku {
         {
             // Turn off loading modal if it's active
             ToggleLoadingModal(false);
+
+            // Add the solver callback to the actions object so it can be invoked asynchronously
+            m_actions += SolverCallback;
 
             // Handle case when rest request error occurred
             string requestError = PlayerPrefs.GetString("RestRequestError");
@@ -146,30 +158,13 @@ namespace Superdoku {
             }
         }
 
-        /**
-         * Solve the Sudoku puzzle when the Solve button is clicked
-         * */
-        public void OnSolve() {
-            if (DEBUG_MODE) { Debug.Log("Solving puzzle..."); }
-
-            float startTime, endTime;
-
-            if (DEBUG_MODE) { Debug.Log("Here is the problem:\n"); }
-            PuzzleGrid.Instance.Show();
-
-            startTime = Time.deltaTime * 1000.0f;
-
-            //Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
-            PuzzleGrid.Instance.SolvePuzzle(0, 0);
-
+        private void SolverCallback()
+        {
             // Validate solved puzzle to ensure that a solution was found (e.g., solution exists)
             if (PuzzleGrid.Instance.IsValidSolution())
             {
                 if (DEBUG_MODE) { Debug.Log("\nHere is the solution:\n"); }
                 PuzzleGrid.Instance.Show();
-
-                endTime = Time.deltaTime * 1000.0f;
-                if (DEBUG_MODE) { Debug.Log("Solution took " + (endTime - startTime) + " millisecond(s) to derive."); }
             }
             else
             {
@@ -184,6 +179,40 @@ namespace Superdoku {
 
             // Deselect current active cell
             m_currentActiveCell = null;
+
+            // Turn off the loading modal now that processing is complete
+            ToggleLoadingModal(false);
+        }
+
+        private async void SolveAsync()
+        {
+            await Task.Run(() =>
+            {
+                PuzzleGrid.Instance.SolvePuzzle(0, 0);
+
+                Dispatcher.Instance.Invoke(() =>
+                {
+                    m_actions();
+                });
+            });
+        }
+
+        /**
+         * Solve the Sudoku puzzle when the Solve button is clicked
+         * */
+        public void OnSolve() {
+            if (DEBUG_MODE) { Debug.Log("Solving puzzle..."); }
+
+            // Display loading modal until processing is complete
+            ToggleLoadingModal(true);
+
+            if (DEBUG_MODE) { Debug.Log("Here is the problem:\n"); }
+            PuzzleGrid.Instance.Show();
+
+            // Invoke main process for solving puzzle
+            // Begin the Sudoku-solving algorithm at the beginning of the 9x9 matrix
+            //PuzzleGrid.Instance.SolvePuzzle(0, 0);
+            SolveAsync();
         }
 
         /**
