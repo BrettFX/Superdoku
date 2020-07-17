@@ -2,7 +2,6 @@
 using Kakera;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -21,7 +20,7 @@ namespace Superdoku {
             }
         }
 
-        public const bool DEBUG_MODE = true;
+        public static bool DEBUG_MODE = false;
         public const int HOME_SCENE = 0;
         public const int IMAGE_PROCESSOR_SCENE = 1;
         public const string IMAGE_PATH_KEY = "CurrentImagePath";
@@ -80,9 +79,6 @@ namespace Superdoku {
         {
             // Turn off loading modal if it's active
             ToggleLoadingModal(false);
-
-            // Add the solver callback to the actions object so it can be invoked asynchronously
-            //m_actions += SolverCallback;
 
             // Handle case when rest request error occurred
             string requestError = PlayerPrefs.GetString("RestRequestError");

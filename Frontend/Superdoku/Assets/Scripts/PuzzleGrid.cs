@@ -27,11 +27,11 @@ namespace Superdoku
         };
 
         [Header("Cells")]
-        //public Row[] cells;
         public GameObject[] cellRows;
         private int[,] sudokuPuzzle;
 
         private volatile bool m_solvingState = false;
+        private volatile int m_frameHeartbeat = 0;
 
         /**
          * Ensure this class remains a singleton instance
@@ -90,16 +90,25 @@ namespace Superdoku
         // Update is called once per frame
         void Update()
         {
+            // Keep track of frame changes by cycling through frames (resets to 0 every 100 frames to prevent integer overflow)
+            m_frameHeartbeat = (m_frameHeartbeat + 1) % 100;
+
             // Only update if not currently running the solve process
             if (!m_solvingState)
             {
                 // Keep the sudoku puzzle integer 2d array in sync with ui cells
                 for (int row = 0; row < cellRows.Length; row++)
                 {
+                    // Break if the solving state was set to true before the initial catch
+                    if (m_solvingState) break;
+
                     Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
 
                     for (int col = 0; col < cellButtons.Length; col++)
                     {
+                        // Break if the solving state was set to true before the initial catch
+                        if (m_solvingState) break;
+
                         Button cellButton = cellButtons[col];
                         string btnText = cellButton.GetComponentInChildren<Text>().text;
 
@@ -243,6 +252,12 @@ namespace Superdoku
         {
             // Need to set the solving state to prevent conflicting with the update function
             m_solvingState = true;
+            int currentFrame = m_frameHeartbeat;
+            
+            // Wait for end of frame so that the update function doesn't render a part of the solving process
+            // (Equivalent to WaitForEndOfFrame)
+            while (currentFrame == m_frameHeartbeat);
+
             SolvePuzzleRecursive(row, col);
             m_solvingState = false;
         }
