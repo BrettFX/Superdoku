@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static Utils;
@@ -10,10 +11,27 @@ namespace Superdoku
         private static PuzzleGrid instance;
         public static PuzzleGrid Instance { get { return instance; } }
 
+        private static readonly int[] TEST_PUZZLE =
+        {
+            0, 0, 0,    0, 0, 0,    0, 0, 0,
+            0, 0, 0,    0, 0, 3,    0, 8, 5,
+            0, 0, 1,    0, 2, 0,    0, 0, 0,
+
+            0, 0, 0,    5, 0, 7,    0, 0, 0,
+            0, 0, 4,    0, 0, 0,    1, 0, 0,
+            0, 9, 0,    0, 0, 0,    0, 0, 0,
+
+            5, 0, 0,    0, 0, 0,    0, 7, 3,
+            0, 0, 2,    0, 1, 0,    0, 0, 0,
+            0, 0, 0,    0, 4, 0,    0, 0, 9,
+        };
+
         [Header("Cells")]
         //public Row[] cells;
         public GameObject[] cellRows;
         private int[,] sudokuPuzzle;
+
+        private volatile bool m_solvingState = false;
 
         /**
          * Ensure this class remains a singleton instance
@@ -48,7 +66,13 @@ namespace Superdoku
             sudokuPuzzle = new int[9, 9];
             GameManager.Instance.InitializePuzzle();
 
-            // Load the scanned puzzle if one exists
+            // Load test puzzle if debug mode for testing
+            if (GameManager.DEBUG_MODE)
+            {
+                sudokuPuzzle = BuildSudokuGrid(new List<int>(TEST_PUZZLE));
+                Show(); // Invoke show method to render to puzzle UI
+            }
+            
             if (puzzleStr != null && puzzleStr != "")
             {
                 // Delete the key so that a previously scanned puzzle isn't loaded all the time
@@ -66,40 +90,44 @@ namespace Superdoku
         // Update is called once per frame
         void Update()
         {
-            // Keep the sudoku puzzle integer 2d array in sync with ui cells
-            for (int row = 0; row < cellRows.Length; row++)
+            // Only update if not currently running the solve process
+            if (!m_solvingState)
             {
-                Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
-
-                for (int col = 0; col < cellButtons.Length; col++)
+                // Keep the sudoku puzzle integer 2d array in sync with ui cells
+                for (int row = 0; row < cellRows.Length; row++)
                 {
-                    Button cellButton = cellButtons[col];
-                    string btnText = cellButton.GetComponentInChildren<Text>().text;
+                    Button[] cellButtons = cellRows[row].GetComponentsInChildren<Button>();
 
-                    // Get integer representation
-                    int btnValue = btnText.Equals("") ? 0 : Convert.ToInt32(btnText);
-                    sudokuPuzzle[row, col] = btnValue;
-
-                    // Only validate cells that aren't blank
-                    if (btnValue != 0)
+                    for (int col = 0; col < cellButtons.Length; col++)
                     {
-                        // Reference respective button colors
-                        ColorBlock colors = cellButton.colors;
-                        if (FollowsRowRule(row, col, btnValue) && FollowsColRule(col, row, btnValue) && FollowsSquareRule(row, col, btnValue))
+                        Button cellButton = cellButtons[col];
+                        string btnText = cellButton.GetComponentInChildren<Text>().text;
+
+                        // Get integer representation
+                        int btnValue = btnText.Equals("") ? 0 : Convert.ToInt32(btnText);
+                        sudokuPuzzle[row, col] = btnValue;
+
+                        // Only validate cells that aren't blank
+                        if (btnValue != 0)
                         {
-                            // Revert back to default colors as needed
-                            GameManager.Instance.SetButtonColor(cellButton, true);
+                            // Reference respective button colors
+                            ColorBlock colors = cellButton.colors;
+                            if (FollowsRowRule(row, col, btnValue) && FollowsColRule(col, row, btnValue) && FollowsSquareRule(row, col, btnValue))
+                            {
+                                // Revert back to default colors as needed
+                                GameManager.Instance.SetButtonColor(cellButton, true);
+                            }
+                            else
+                            {
+                                // Highlight invalid cells accordingly
+                                GameManager.Instance.SetButtonColor(cellButton, false);
+                            }
                         }
                         else
                         {
-                            // Highlight invalid cells accordingly
-                            GameManager.Instance.SetButtonColor(cellButton, false);
+                            // Revert back to default colors as needed (handles cornercase of clearing when formally invalid)
+                            GameManager.Instance.SetButtonColor(cellButton, true);
                         }
-                    }
-                    else
-                    {
-                        // Revert back to default colors as needed (handles cornercase of clearing when formally invalid)
-                        GameManager.Instance.SetButtonColor(cellButton, true);
                     }
                 }
             }
@@ -206,14 +234,28 @@ namespace Superdoku
 
         /**
 	    * Driver method to solve the SuDoKu puzzle.
-	    * Recursively determines the correct numbers for each cell
+	    * Invokes a recursive delegate function to determine the correct numbers for each cell
 	    * 
 	    * @param row the current row within the 9x9 SuDoKu puzzle
 	    * @param col the current column  within the 9x9 SuDoKu puzzle
 	    * */
         public void SolvePuzzle(int row, int col)
         {
+            // Need to set the solving state to prevent conflicting with the update function
+            m_solvingState = true;
+            SolvePuzzleRecursive(row, col);
+            m_solvingState = false;
+        }
 
+        /**
+         * Recursive delegate function to solve the sudoku puzzle using the
+         * classic backtacking algorithm.
+         * 
+         * @param row the current row within the 9x9 SuDoKu puzzle
+	     * @param col the current column  within the 9x9 SuDoKu puzzle
+         */
+        private void SolvePuzzleRecursive(int row, int col)
+        {
             if (col > 8)
             {
                 col = 0;
@@ -235,7 +277,7 @@ namespace Superdoku
                     if (FollowsRowRule(row, col, num) && FollowsColRule(col, row, num) && FollowsSquareRule(row, col, num))
                     {
                         sudokuPuzzle[row, col] = num;
-                        SolvePuzzle(row, col + 1);
+                        SolvePuzzleRecursive(row, col + 1);
 
                         if (GameManager.Instance.IsSolved())
                             return;
@@ -247,9 +289,8 @@ namespace Superdoku
             else
             {
                 //Skip cells that already have numbers 1-9
-                SolvePuzzle(row, col + 1);
+                SolvePuzzleRecursive(row, col + 1);
             }
-
         }
 
         public bool IsValidSolution()
