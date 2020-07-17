@@ -113,7 +113,7 @@ public class SuperdokuAPI {
 				LOGGER.error("IOException:", e);
 			}
 			
-		    LOGGER.info("Read line from file: " + csvLine);
+		    LOGGER.info("Classified Digits: " + csvLine);
 		    
 		    // Tokenize the puzzle string to a string array and then parse to an integer array
 		    String[] tokens = csvLine.trim().split(","); // Be sure to trim to get rid of newline characters

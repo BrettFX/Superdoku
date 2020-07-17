@@ -41,7 +41,7 @@ namespace Superdoku
         }
 
         public GameObject testImage;
-        public const string BASE_URL = "http://192.168.0.238:8080/SuperdokuAPI/rest/{0}";
+        public const string BASE_URL = "http://35.245.6.20:8080/SuperdokuAPI/rest/{0}";
         public const int TIMEOUT = 60; // in seconds
 
         /**
@@ -151,11 +151,14 @@ namespace Superdoku
                     sb.Append(dict.Key).Append(": \t[").Append(dict.Value).Append("]\n");
                 }
 
-                // Print Headers
-                Debug.Log(sb.ToString());
+                if (GameManager.DEBUG_MODE)
+                {
+                    // Print Headers
+                    Debug.Log(sb.ToString());
 
-                // Print Body
-                Debug.Log(request.downloadHandler.text);
+                    // Print Body
+                    Debug.Log(request.downloadHandler.text);
+                }
 
                 // Set puzzle grid and navigate to home screen
                 PlayerPrefs.SetString("ScannedPuzzle", request.downloadHandler.text);

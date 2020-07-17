@@ -1,13 +1,16 @@
 ﻿using ExifLib;
 using Kakera;
+using System;
 using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Superdoku {
+
     public class GameManager: MonoBehaviour {
         // Static Refs //
         private static GameManager instance;
@@ -17,7 +20,7 @@ namespace Superdoku {
             }
         }
 
-        public const bool DEBUG_MODE = true;
+        public static bool DEBUG_MODE = false;
         public const int HOME_SCENE = 0;
         public const int IMAGE_PROCESSOR_SCENE = 1;
         public const string IMAGE_PATH_KEY = "CurrentImagePath";
@@ -41,7 +44,7 @@ namespace Superdoku {
         [Header("Error Handle")]
         public Text errorMsgText;
 
-        private bool m_solved = false;
+        private volatile bool m_solved = false;
 
         private static GameObject m_currentActiveCell;
 
@@ -146,44 +149,73 @@ namespace Superdoku {
             }
         }
 
+        private Task SolverTask()
+        {
+            // Begin the Sudoku-solving algorithm at the beginning of the 9x9 matrix
+            return Task.Run(() => PuzzleGrid.Instance.SolvePuzzle(0, 0));
+        }
+
+        private async Task SolveAsync(Action callback)
+        {
+            var solverTask = SolverTask();
+
+            await Task.Run(async () =>
+            {
+                while (!solverTask.IsCompleted)
+                {
+                    // Await call to no-delay to supress warning for not having an await call in async lambda def
+                    await Task.Delay(0);
+                }
+
+                // Invoke the callback now that the solver task has completed
+                callback?.Invoke();
+            });
+        }
+
         /**
          * Solve the Sudoku puzzle when the Solve button is clicked
          * */
-        public void OnSolve() {
-            if (DEBUG_MODE) { Debug.Log("Solving puzzle..."); }
-
-            float startTime, endTime;
-
-            if (DEBUG_MODE) { Debug.Log("Here is the problem:\n"); }
-            PuzzleGrid.Instance.Show();
-
-            startTime = Time.deltaTime * 1000.0f;
-
-            //Begin the SuDoKu-solving algorithm at the beginning of the 9x9 matrix
-            PuzzleGrid.Instance.SolvePuzzle(0, 0);
-
-            // Validate solved puzzle to ensure that a solution was found (e.g., solution exists)
-            if (PuzzleGrid.Instance.IsValidSolution())
+        public async void OnSolve() {
+            Dispatcher.RunOnMainThread(() =>
             {
-                if (DEBUG_MODE) { Debug.Log("\nHere is the solution:\n"); }
+                if (DEBUG_MODE) { Debug.Log("Solving puzzle..."); }
+
+                // Display loading modal until processing is complete
+                ToggleLoadingModal(true);
+
+                if (DEBUG_MODE) { Debug.Log("Here is the problem:\n"); }
                 PuzzleGrid.Instance.Show();
+            });
 
-                endTime = Time.deltaTime * 1000.0f;
-                if (DEBUG_MODE) { Debug.Log("Solution took " + (endTime - startTime) + " millisecond(s) to derive."); }
-            }
-            else
+            // Invoke main process for solving puzzle
+            await SolveAsync(() =>
             {
-                Debug.Log("Solution not valid. No solution possible.");
-                // Set error message text
-                string msg = "A solution does not exist for the given Sudoku puzzle. " +
-                             "Please make sure the puzzle has been entered or loaded" +
-                             " correctly and try to solve again.";
-                errorMsgText.text = msg;
-                errorModal.SetActive(true);
-            }
+                Dispatcher.RunOnMainThread(() =>
+                {
+                    // Validate solved puzzle to ensure that a solution was found (e.g., solution exists)
+                    if (PuzzleGrid.Instance.IsValidSolution())
+                    {
+                        if (DEBUG_MODE) { Debug.Log("\nHere is the solution:\n"); }
+                        PuzzleGrid.Instance.Show();
+                    }
+                    else
+                    {
+                        Debug.Log("Solution not valid. No solution possible.");
+                        // Set error message text
+                        string msg = "A solution does not exist for the given Sudoku puzzle. " +
+                                    "Please make sure the puzzle has been entered or loaded" +
+                                    " correctly and try to solve again.";
+                        errorMsgText.text = msg;
+                        errorModal.SetActive(true);
+                    }
 
-            // Deselect current active cell
-            m_currentActiveCell = null;
+                    // Deselect current active cell
+                    m_currentActiveCell = null;
+
+                    // Turn off the loading modal now that processing is complete
+                    ToggleLoadingModal(false);
+                });
+            });
         }
 
         /**
